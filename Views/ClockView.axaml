@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:DigitalClock.ViewModels"
+             x:Class="DigitalClock.Views.ClockView"
+             x:DataType="vm:ClockViewModel">
+
+	<Grid Background="#101319">
+
+		<StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Spacing="15">
+
+			<TextBlock
+                Text="{Binding Time}"
+                FontSize="90"
+                FontWeight="Bold"
+                Foreground="White"
+                FontFamily="Consolas"
+                HorizontalAlignment="Center"/>
+
+			<TextBlock
+                Text="{Binding Date}"
+                FontSize="20"
+                Foreground="#AAAAAA"
+                HorizontalAlignment="Center"/>
+
+		</StackPanel>
+
+	</Grid>
+</UserControl>
