@@ -9,9 +9,11 @@
                       HorizontalScrollBarVisibility="Disabled">
 
 			<StackPanel
-	            HorizontalAlignment="Center"
+	            HorizontalAlignment="Stretch"
 	            VerticalAlignment="Center"
-	            Spacing="15">
+	            MaxWidth="760"
+                Margin="20,28"
+	            Spacing="12">
 
 				<TextBlock
 	                Text="{Binding Time}"
@@ -24,7 +26,7 @@
 				<TextBlock
 	                Text="{Binding Date}"
 	                FontSize="20"
-	                Foreground="#AAAAAA"
+	                Foreground="#8F9BAE"
 	                HorizontalAlignment="Center"/>
 
 				<TextBlock Text="Add places to appsettings.json, then restart."
@@ -34,20 +36,60 @@
 	                       HorizontalAlignment="Center"/>
 
 				<ItemsControl ItemsSource="{Binding WeatherLocations}"
-	                          HorizontalAlignment="Center">
+	                          Margin="0,16,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel HorizontalAlignment="Center"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="vm:WeatherLocationViewModel">
-							<StackPanel Orientation="Horizontal"
-	                                    HorizontalAlignment="Center"
-	                                    Spacing="12"
-	                                    Margin="0,4">
-								<TextBlock Text="{Binding Name}"
-	                                       FontSize="20"
-	                                       Foreground="#AAAAAA"/>
-								<TextBlock Text="{Binding Summary}"
-	                                       FontSize="20"
-	                                       Foreground="White"/>
-							</StackPanel>
+                            <Border Width="210"
+                                    Margin="8"
+                                    Padding="20,18"
+                                    CornerRadius="18"
+                                    BorderBrush="#2A3547"
+                                    BorderThickness="1"
+                                    BoxShadow="0 8 24 0 #22000000">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                        <GradientStop Offset="0" Color="#1D2939"/>
+                                        <GradientStop Offset="1" Color="#151C27"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+
+                                <StackPanel Spacing="10">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="16"
+                                                   FontWeight="Medium"
+                                                   Foreground="#C2CDDD"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <Ellipse Grid.Column="1"
+                                                 Width="6"
+                                                 Height="6"
+                                                 Margin="10,0,0,0"
+                                                 Fill="#7DD3FC"
+                                                 VerticalAlignment="Center"/>
+                                    </Grid>
+
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <TextBlock Text="{Binding Temperature}"
+                                                   FontSize="44"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#F4F7FC"/>
+                                        <TextBlock Text="°C"
+                                                   FontSize="20"
+                                                   Foreground="#8DA4BF"
+                                                   Margin="0,9,0,0"/>
+                                    </StackPanel>
+
+                                    <TextBlock Text="{Binding Description}"
+                                               FontSize="14"
+                                               Foreground="#9FB1C5"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ItemsControl>

@@ -10,7 +10,10 @@ public partial class WeatherLocationViewModel : ViewModelBase
     public string Name => Location.Name;
 
     [ObservableProperty]
-    private string _summary = "Loading weather...";
+    private string _temperature = "--";
+
+    [ObservableProperty]
+    private string _description = "Loading weather...";
 
     public WeatherLocationViewModel(WeatherLocation location)
     {

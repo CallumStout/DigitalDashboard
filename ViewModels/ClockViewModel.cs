@@ -99,7 +99,8 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
             if (!_isDisposed)
             {
-                location.Summary = $"{weather.Temperature:0}°C · {weather.Description}";
+                location.Temperature = $"{weather.Temperature:0}";
+                location.Description = weather.Description;
             }
         }
         catch (OperationCanceledException) when (_isDisposed)
@@ -112,7 +113,8 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
             if (!_isDisposed)
             {
-                location.Summary = "Weather unavailable";
+                location.Temperature = "--";
+                location.Description = "Weather unavailable";
             }
         }
     }

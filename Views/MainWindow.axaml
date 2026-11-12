@@ -4,7 +4,7 @@
         x:Class="DigitalClock.Views.MainWindow"
         Title="Digital Clock"
         Width="800"
-        Height="300">
+        Height="480">
 
 	<views:ClockView/>
 
