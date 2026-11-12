@@ -5,27 +5,54 @@
              x:DataType="vm:ClockViewModel">
 
 	<Grid Background="#101319">
+		<ScrollViewer VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled">
 
-		<StackPanel
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Spacing="15">
+			<StackPanel
+	            HorizontalAlignment="Center"
+	            VerticalAlignment="Center"
+	            Spacing="15">
 
-			<TextBlock
-                Text="{Binding Time}"
-                FontSize="90"
-                FontWeight="Bold"
-                Foreground="White"
-                FontFamily="Consolas"
-                HorizontalAlignment="Center"/>
+				<TextBlock
+	                Text="{Binding Time}"
+	                FontSize="90"
+	                FontWeight="Bold"
+	                Foreground="White"
+	                FontFamily="Consolas"
+	                HorizontalAlignment="Center"/>
 
-			<TextBlock
-                Text="{Binding Date}"
-                FontSize="20"
-                Foreground="#AAAAAA"
-                HorizontalAlignment="Center"/>
+				<TextBlock
+	                Text="{Binding Date}"
+	                FontSize="20"
+	                Foreground="#AAAAAA"
+	                HorizontalAlignment="Center"/>
 
-		</StackPanel>
+				<TextBlock Text="Add places to appsettings.json, then restart."
+	                       IsVisible="{Binding HasNoWeatherLocations}"
+	                       FontSize="16"
+	                       Foreground="#AAAAAA"
+	                       HorizontalAlignment="Center"/>
+
+				<ItemsControl ItemsSource="{Binding WeatherLocations}"
+	                          HorizontalAlignment="Center">
+					<ItemsControl.ItemTemplate>
+						<DataTemplate x:DataType="vm:WeatherLocationViewModel">
+							<StackPanel Orientation="Horizontal"
+	                                    HorizontalAlignment="Center"
+	                                    Spacing="12"
+	                                    Margin="0,4">
+								<TextBlock Text="{Binding Name}"
+	                                       FontSize="20"
+	                                       Foreground="#AAAAAA"/>
+								<TextBlock Text="{Binding Summary}"
+	                                       FontSize="20"
+	                                       Foreground="White"/>
+							</StackPanel>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+			</StackPanel>
+		</ScrollViewer>
 
 	</Grid>
 </UserControl>

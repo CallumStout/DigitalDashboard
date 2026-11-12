@@ -7,6 +7,11 @@ using DigitalClock.Views;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using DigitalClock.Services;
+using System;
+using System.Net.Http;
+using DigitalClock.Models;
+using System.IO;
+using System.Text.Json;
 
 namespace DigitalClock
 {
@@ -26,9 +31,17 @@ namespace DigitalClock
                 DisableAvaloniaDataAnnotationValidation();
 
                 var services = new ServiceCollection();
+                var settings = LoadSettings();
+
+                services.AddSingleton(settings);
 
                 // Register our services
                 services.AddSingleton<IClockService, ClockService>();
+                services.AddSingleton(_ => new HttpClient
+                {
+                    Timeout = TimeSpan.FromSeconds(10)
+                });
+                services.AddSingleton<IWeatherService, WeatherService>();
 
                 // Register our ViewModel
                 services.AddTransient<ClockViewModel>();
@@ -40,9 +53,51 @@ namespace DigitalClock
                     DataContext =
                         serviceProvider.GetRequiredService<ClockViewModel>()
                 };
+
+                desktop.Exit += (_, _) =>
+                {
+                    (desktop.MainWindow.DataContext as IDisposable)?.Dispose();
+                    serviceProvider.Dispose();
+                };
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+
+        private static AppSettings LoadSettings()
+        {
+            var settingsPath = Path.Combine(AppContext.BaseDirectory, "appsettings.json");
+
+            if (!File.Exists(settingsPath))
+            {
+                var emptySettings = new AppSettings
+                {
+                    WeatherLocations = new()
+                };
+
+                File.WriteAllText(settingsPath, JsonSerializer.Serialize(emptySettings,
+                    new JsonSerializerOptions { WriteIndented = true }));
+            }
+
+            var settings = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(settingsPath));
+
+            if (settings?.WeatherLocations == null)
+            {
+                throw new InvalidDataException("appsettings.json must contain a WeatherLocations list.");
+            }
+
+            foreach (var location in settings.WeatherLocations)
+            {
+                if (location == null || string.IsNullOrWhiteSpace(location.Name)
+                    || !double.IsFinite(location.Latitude) || location.Latitude < -90 || location.Latitude > 90
+                    || !double.IsFinite(location.Longitude) || location.Longitude < -180 || location.Longitude > 180)
+                {
+                    throw new InvalidDataException("Each weather location needs a name and valid coordinates in appsettings.json.");
+                }
+            }
+
+            return settings;
         }
 
 
