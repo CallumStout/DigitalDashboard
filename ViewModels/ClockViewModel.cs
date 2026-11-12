@@ -1,8 +1,8 @@
-﻿
+
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DigitalClock.Services;
-using DigitalClock.Models;
+using DigitalDashboard.Services;
+using DigitalDashboard.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,7 +13,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitalClock.ViewModels;
+namespace DigitalDashboard.ViewModels;
 
 public partial class ClockViewModel : ViewModelBase, IDisposable
 {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace DigitalClock.Models;
+namespace DigitalDashboard.Models;
 
 public class AppSettings
 {

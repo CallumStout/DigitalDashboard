@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using DigitalClock.Models;
+using DigitalDashboard.Models;
 
-namespace DigitalClock.ViewModels;
+namespace DigitalDashboard.ViewModels;
 
 public partial class WeatherLocationViewModel : ViewModelBase
 {

@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace DigitalClock.Views;
+namespace DigitalDashboard.Views;
 
 public partial class MainWindow : Window
 {

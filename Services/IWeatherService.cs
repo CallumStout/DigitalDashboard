@@ -1,8 +1,8 @@
-using DigitalClock.Models;
+using DigitalDashboard.Models;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitalClock.Services;
+namespace DigitalDashboard.Services;
 
 public interface IWeatherService
 {

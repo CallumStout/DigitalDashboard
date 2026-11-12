@@ -1,4 +1,4 @@
-namespace DigitalClock.Models;
+namespace DigitalDashboard.Models;
 
 public class Weather
 {

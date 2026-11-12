@@ -1,4 +1,4 @@
-# DigitalClock
+# DigitalDashboard
 
 A simple Avalonia clock and weather dashboard.
 

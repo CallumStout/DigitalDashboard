@@ -2,18 +2,18 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using DigitalClock.ViewModels;
-using DigitalClock.Views;
+using DigitalDashboard.ViewModels;
+using DigitalDashboard.Views;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using DigitalClock.Services;
+using DigitalDashboard.Services;
 using System;
 using System.Net.Http;
-using DigitalClock.Models;
+using DigitalDashboard.Models;
 using System.IO;
 using System.Text.Json;
 
-namespace DigitalClock
+namespace DigitalDashboard
 {
     public partial class App : Application
     {

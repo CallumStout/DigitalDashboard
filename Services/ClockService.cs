@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace DigitalClock.Services;
+namespace DigitalDashboard.Services;
 
 public class ClockService : IClockService
 {

@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:DigitalClock.ViewModels"
-             x:Class="DigitalClock.Views.ClockView"
+             xmlns:vm="using:DigitalDashboard.ViewModels"
+             x:Class="DigitalDashboard.Views.ClockView"
              x:DataType="vm:ClockViewModel">
 
 	<Grid Background="#101319">

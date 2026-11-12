@@ -1,7 +1,7 @@
-﻿using Avalonia;
+using Avalonia;
 using System;
 
-namespace DigitalClock
+namespace DigitalDashboard
 {
     internal sealed class Program
     {
