@@ -6,14 +6,17 @@
              x:DataType="vm:ClockViewModel">
 
 	<Grid Background="#101319">
-            <Grid ColumnDefinitions="240,*"
+            <Grid ColumnDefinitions="200,*"
                   MaxWidth="960"
                   HorizontalAlignment="Stretch"
-                  Margin="32"
+                  Margin="16"
                   VerticalAlignment="Stretch">
-                <ScrollViewer Grid.Column="0"
-                              Margin="0,0,32,0"
-                              VerticalScrollBarVisibility="Auto"
+                <ScrollViewer x:Name="WeatherScroller"
+                              Grid.Column="0"
+                              Margin="0,0,16,0"
+                              Background="Transparent"
+                              IsScrollInertiaEnabled="True"
+                              VerticalScrollBarVisibility="Hidden"
                               HorizontalScrollBarVisibility="Disabled">
                 <StackPanel
                             HorizontalAlignment="Stretch"
@@ -38,7 +41,7 @@
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="vm:WeatherLocationViewModel">
                             <Border
-                                    Padding="20,18"
+                                    Padding="16,14"
                                     CornerRadius="18"
                                     BorderBrush="#2A3547"
                                     BorderThickness="1"
@@ -67,7 +70,7 @@
 
                                     <StackPanel Orientation="Horizontal" Spacing="4">
                                         <TextBlock Text="{Binding Temperature}"
-                                                   FontSize="44"
+                                                   FontSize="36"
                                                    FontWeight="SemiBold"
                                                    Foreground="#F4F7FC"/>
                                         <TextBlock Text="°C"
@@ -92,19 +95,19 @@
                       RowDefinitions="Auto,*"
                       HorizontalAlignment="Stretch">
                     <StackPanel Spacing="8"
-                                Margin="0,0,0,32"
+                                Margin="0,0,0,16"
                                 HorizontalAlignment="Stretch">
                         <Viewbox Stretch="Uniform"
                                  StretchDirection="DownOnly"
                                  HorizontalAlignment="Center">
                             <TextBlock Text="{Binding Time}"
-                                       FontSize="90"
+                                       FontSize="64"
                                        FontWeight="Bold"
                                        Foreground="White"
                                        FontFamily="Consolas"/>
                         </Viewbox>
                         <TextBlock Text="{Binding Date}"
-                                   FontSize="20"
+                                   FontSize="18"
                                    Foreground="#8F9BAE"
                                    TextAlignment="Center"
                                    TextWrapping="Wrap"/>
@@ -117,8 +120,11 @@
                                    FontWeight="SemiBold"
                                    Foreground="#F4F7FC"/>
 
-                        <ScrollViewer Grid.Row="1"
-                                      VerticalScrollBarVisibility="Auto"
+                        <ScrollViewer x:Name="EventsScroller"
+                                      Grid.Row="1"
+                                      Background="Transparent"
+                                      IsScrollInertiaEnabled="True"
+                                      VerticalScrollBarVisibility="Hidden"
                                       HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl ItemsSource="{Binding CalendarEvents}">
                             <ItemsControl.ItemsPanel>

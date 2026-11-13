@@ -6,6 +6,9 @@ Google Calendar events. Built with .NET 10.
 Weather cards sit on the left, with the clock and date centered above individual
 event cards on the right. The layout is capped at 960 pixels wide. Events scroll
 independently beneath the clock; weather also scrolls if it exceeds the window height.
+Swipe anywhere on either list to scroll; narrow scrollbars are hidden. Mouse dragging
+is also supported for touchscreens that report mouse input. Compact spacing and a
+smaller clock leave more room for cards on a 7-inch landscape display.
 
 ## Run locally
 
