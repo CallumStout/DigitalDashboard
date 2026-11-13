@@ -4,7 +4,8 @@
         x:Class="DigitalDashboard.Views.MainWindow"
         Title="Digital Dashboard"
         Width="800"
-        Height="480">
+        Height="480"
+	    WindowState="FullScreen">
 
 	<views:ClockView/>
 
