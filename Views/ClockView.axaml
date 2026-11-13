@@ -1,51 +1,43 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:DigitalDashboard.ViewModels"
+             xmlns:models="using:DigitalDashboard.Models"
              x:Class="DigitalDashboard.Views.ClockView"
              x:DataType="vm:ClockViewModel">
 
 	<Grid Background="#101319">
-		<ScrollViewer VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled">
-
-			<StackPanel
-	            HorizontalAlignment="Stretch"
-	            VerticalAlignment="Center"
-	            MaxWidth="760"
-                Margin="20,28"
-	            Spacing="12">
-
-				<TextBlock
-	                Text="{Binding Time}"
-	                FontSize="90"
-	                FontWeight="Bold"
-	                Foreground="White"
-	                FontFamily="Consolas"
-	                HorizontalAlignment="Center"/>
-
-				<TextBlock
-	                Text="{Binding Date}"
-	                FontSize="20"
-	                Foreground="#8F9BAE"
-	                HorizontalAlignment="Center"/>
+            <Grid ColumnDefinitions="240,*"
+                  MaxWidth="960"
+                  HorizontalAlignment="Stretch"
+                  Margin="32"
+                  VerticalAlignment="Stretch">
+                <ScrollViewer Grid.Column="0"
+                              Margin="0,0,32,0"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                <StackPanel
+                            HorizontalAlignment="Stretch"
+                            Spacing="16">
+                    <TextBlock Text="Weather"
+                               FontSize="18"
+                               FontWeight="SemiBold"
+                               Foreground="#F4F7FC"/>
 
 				<TextBlock Text="Add places to appsettings.json, then restart."
 	                       IsVisible="{Binding HasNoWeatherLocations}"
 	                       FontSize="16"
 	                       Foreground="#AAAAAA"
-	                       HorizontalAlignment="Center"/>
+	                       TextWrapping="Wrap"/>
 
-				<ItemsControl ItemsSource="{Binding WeatherLocations}"
-	                          Margin="0,16,0,0">
+                <ItemsControl ItemsSource="{Binding WeatherLocations}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel HorizontalAlignment="Center"/>
+                            <StackPanel Spacing="16"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
 					<ItemsControl.ItemTemplate>
 						<DataTemplate x:DataType="vm:WeatherLocationViewModel">
-                            <Border Width="210"
-                                    Margin="8"
+                            <Border
                                     Padding="20,18"
                                     CornerRadius="18"
                                     BorderBrush="#2A3547"
@@ -93,8 +85,81 @@
 						</DataTemplate>
 					</ItemsControl.ItemTemplate>
 				</ItemsControl>
-			</StackPanel>
-		</ScrollViewer>
+                </StackPanel>
+                </ScrollViewer>
+
+                <Grid Grid.Column="1"
+                      RowDefinitions="Auto,*"
+                      HorizontalAlignment="Stretch">
+                    <StackPanel Spacing="8"
+                                Margin="0,0,0,32"
+                                HorizontalAlignment="Stretch">
+                        <Viewbox Stretch="Uniform"
+                                 StretchDirection="DownOnly"
+                                 HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding Time}"
+                                       FontSize="90"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       FontFamily="Consolas"/>
+                        </Viewbox>
+                        <TextBlock Text="{Binding Date}"
+                                   FontSize="20"
+                                   Foreground="#8F9BAE"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <Grid Grid.Row="1" RowDefinitions="Auto,*">
+                        <TextBlock Text="Upcoming Events"
+                                   Margin="0,0,0,16"
+                                   FontSize="18"
+                                   FontWeight="SemiBold"
+                                   Foreground="#F4F7FC"/>
+
+                        <ScrollViewer Grid.Row="1"
+                                      VerticalScrollBarVisibility="Auto"
+                                      HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl ItemsSource="{Binding CalendarEvents}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="12"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:CalendarEventModel">
+                                    <Border Background="#202936"
+                                            CornerRadius="12"
+                                            BorderBrush="#2A3547"
+                                            BorderThickness="1"
+                                            Padding="20,16">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="{Binding Start, StringFormat='{}{0:ddd dd MMM}'}"
+                                                   FontSize="13"
+                                                   Foreground="#9FB1C5"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Title}"
+                                                   FontSize="17"
+                                                   FontWeight="Medium"
+                                                   Foreground="#F4F7FC"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        </ScrollViewer>
+
+                        <TextBlock Text="No upcoming events"
+                                   Grid.Row="1"
+                                   VerticalAlignment="Top"
+                                   Foreground="#F4F7FC"
+                                   Opacity="0.6"
+                                   IsVisible="{Binding HasNoCalendarEvents}"/>
+                    </Grid>
+                </Grid>
+            </Grid>
 
 	</Grid>
 </UserControl>

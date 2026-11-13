@@ -42,6 +42,7 @@ namespace DigitalDashboard
                     Timeout = TimeSpan.FromSeconds(10)
                 });
                 services.AddSingleton<IWeatherService, WeatherService>();
+                services.AddSingleton<ICalendarService, GoogleCalendarService>();
 
                 // Register our ViewModel
                 services.AddTransient<ClockViewModel>();

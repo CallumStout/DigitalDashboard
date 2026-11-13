@@ -1,8 +1,7 @@
-
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DigitalDashboard.Services;
 using DigitalDashboard.Models;
+using DigitalDashboard.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -19,11 +18,17 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 {
     private readonly IClockService _clockService;
     private readonly IWeatherService _weatherService;
+    private readonly ICalendarService _calendarService;
+    private readonly DispatcherTimer _calendarTimer;
     private readonly DispatcherTimer _timer;
     private readonly DispatcherTimer _weatherTimer;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private bool _isUpdatingWeather;
+    private bool _isUpdatingCalendar;
     private bool _isDisposed;
+
+    [ObservableProperty]
+    private IReadOnlyList<CalendarEventModel> _calendarEvents = [];
 
     [ObservableProperty]
     private string _time = string.Empty;
@@ -35,10 +40,14 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
     public bool HasNoWeatherLocations => WeatherLocations.Count == 0;
 
-    public ClockViewModel(IClockService clockService, IWeatherService weatherService, AppSettings settings)
+    public bool HasNoCalendarEvents => CalendarEvents.Count == 0;
+
+    public ClockViewModel(IClockService clockService, IWeatherService weatherService, AppSettings settings, ICalendarService calendarService)
     {
         _clockService = clockService;
         _weatherService = weatherService;
+        _calendarService = calendarService;
+
         WeatherLocations = settings.WeatherLocations
             .Select(location => new WeatherLocationViewModel(location))
             .ToArray();
@@ -60,6 +69,15 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
         _weatherTimer.Tick += async (_, _) => await UpdateWeatherAsync();
 
+        _calendarTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMinutes(5)
+        };
+
+        _calendarTimer.Tick += async (_, _) => await UpdateCalendarAsync();
+
+        _ = UpdateCalendarAsync();
+        _calendarTimer.Start();
         _ = UpdateWeatherAsync();
         _weatherTimer.Start();
     }
@@ -119,6 +137,38 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         }
     }
 
+    private async Task UpdateCalendarAsync()
+    {
+        if (_isUpdatingCalendar || _isDisposed)
+        {
+            return;
+        }
+
+        _isUpdatingCalendar = true;
+
+        try
+        {
+            CalendarEvents = await _calendarService.GetUpcomingEventsAsync(
+                _cancellationTokenSource.Token);
+        }
+        catch (OperationCanceledException) when (_isDisposed)
+        {
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine($"Unable to update calendar: {exception.Message}");
+        }
+        finally
+        {
+            _isUpdatingCalendar = false;
+        }
+    }
+
+    partial void OnCalendarEventsChanged(IReadOnlyList<CalendarEventModel> value)
+    {
+        OnPropertyChanged(nameof(HasNoCalendarEvents));
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
@@ -129,6 +179,7 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         _isDisposed = true;
         _timer.Stop();
         _weatherTimer.Stop();
+        _calendarTimer.Stop();
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
     }
