@@ -55,6 +55,28 @@
             <Setter Property="Background" Value="#00C7E8"/>
             <Setter Property="Foreground" Value="#07222D"/>
         </Style>
+        <!-- Touch drivers may leave the pointer hovering after release. Keep
+             transport colours stable in that state; only a held press darkens. -->
+        <Style Selector="Button.transport:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#253140"/>
+            <Setter Property="Foreground" Value="#EAF0F7"/>
+        </Style>
+        <Style Selector="Button.transport:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#34465B"/>
+            <Setter Property="Foreground" Value="#EAF0F7"/>
+        </Style>
+        <Style Selector="Button.transport.play:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1ED760"/>
+            <Setter Property="Foreground" Value="#092416"/>
+        </Style>
+        <Style Selector="Button.transport.play:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="#17AD4D"/>
+            <Setter Property="Foreground" Value="#092416"/>
+        </Style>
+        <Style Selector="Button.transport.play:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="#1ED760"/>
+            <Setter Property="Foreground" Value="#092416"/>
+        </Style>
     </UserControl.Styles>
     <Grid Background="#0E131B" RowDefinitions="36,*">
         <Grid ColumnDefinitions="*,Auto" Margin="14,0">
@@ -198,9 +220,9 @@
                                                TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
                                 </StackPanel>
                                 <Grid Grid.Row="3" ColumnDefinitions="*,*,*">
-                                    <Button Content="|‹" Command="{Binding Spotify.PreviousTrackCommand}" Margin="0,0,4,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Previous track"/>
-                                    <Button Grid.Column="1" Content="{Binding Spotify.PlaybackIcon}" Command="{Binding Spotify.TogglePlaybackCommand}" Margin="4,0" HorizontalAlignment="Stretch" FontSize="20" Background="#1ED760" Foreground="#092416" CornerRadius="24" AutomationProperties.Name="{Binding Spotify.PlaybackLabel}"/>
-                                    <Button Grid.Column="2" Content="›|" Command="{Binding Spotify.NextTrackCommand}" Margin="4,0,0,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Next track"/>
+                                    <Button Classes="transport" Content="|‹" Command="{Binding Spotify.PreviousTrackCommand}" Margin="0,0,4,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Previous track"/>
+                                    <Button Classes="transport play" Grid.Column="1" Content="{Binding Spotify.PlaybackIcon}" Command="{Binding Spotify.TogglePlaybackCommand}" Margin="4,0" HorizontalAlignment="Stretch" FontSize="20" Background="#1ED760" Foreground="#092416" CornerRadius="24" AutomationProperties.Name="{Binding Spotify.PlaybackLabel}"/>
+                                    <Button Classes="transport" Grid.Column="2" Content="›|" Command="{Binding Spotify.NextTrackCommand}" Margin="4,0,0,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Next track"/>
                                 </Grid>
                             </Grid>
                         </Grid>
