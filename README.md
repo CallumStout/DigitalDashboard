@@ -3,12 +3,21 @@
 A fullscreen Avalonia dashboard with a live clock, weather cards, and upcoming
 Google Calendar events. Built with .NET 10.
 
-Weather cards sit on the left, with the clock and date centered above individual
-event cards on the right. The layout is capped at 960 pixels wide. Events scroll
-independently beneath the clock; weather also scrolls if it exceeds the window height.
-Swipe anywhere on either list to scroll; narrow scrollbars are hidden. Mouse dragging
-is also supported for touchscreens that report mouse input. Compact spacing and a
-smaller clock leave more room for cards on a 7-inch landscape display.
+The dark home overview is designed for 7-inch landscape displays at 800×480 and
+1024×600. A persistent left navigation rail sits beside three flexible columns:
+clock and agenda, weather and scenes, and home controls and music. Buttons have a
+minimum 48×48 logical-pixel touch target, with spacing between adjacent controls.
+Use native display resolution and check OS display scaling on the target device.
+
+The clock, configured weather locations, and Google Calendar retain their live
+connections. Weather and agenda lists scroll independently with touch inertia;
+mouse dragging also works for touch drivers that report mouse input. Calendar
+entries include their start time or an all-day label.
+
+Thermostat, lights, door, Spotify, scenes, and forecast slots are clearly marked
+as not connected. Playback, thermostat, and scene buttons are disabled until
+integrations are added. Climate, Lighting, and Security navigation opens a
+placeholder page with a working return button. No device status is simulated.
 
 ## Run locally
 

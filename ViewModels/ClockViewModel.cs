@@ -86,8 +86,8 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
     {
         var now = _clockService.GetCurrentTime();
 
-        Time = now.ToString("HH:mm:ss");
-        Date = now.ToString("dddd, dd MMMM yyyy");
+        Time = now.ToString("HH:mm");
+        Date = now.ToString("dddd, dd MMMM");
     }
 
     private async Task UpdateWeatherAsync()

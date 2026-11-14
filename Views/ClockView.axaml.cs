@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 
 namespace DigitalDashboard.Views;
 
@@ -11,6 +13,28 @@ public partial class ClockView : UserControl
         InitializeComponent();
         EnableMouseDragScrolling(WeatherScroller);
         EnableMouseDragScrolling(EventsScroller);
+    }
+
+    private void Navigate(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: string section }) return;
+
+        OverviewPanel.IsVisible = section == "Overview";
+        FeaturePanel.IsVisible = !OverviewPanel.IsVisible;
+        FeatureTitle.Text = section;
+        FeatureDescription.Text = section switch
+        {
+            "Climate" => "Your thermostat and climate controls will appear here once connected.",
+            "Lighting" => "Your lights and room scenes will appear here once connected.",
+            "Security" => "Your door locks and security devices will appear here once connected.",
+            _ => string.Empty
+        };
+
+        foreach (var control in this.GetVisualDescendants())
+        {
+            if (control is Button button && button.Classes.Contains("nav"))
+                button.Classes.Set("active", Equals(button.Tag, section));
+        }
     }
 
     // Native touch uses Avalonia's inertial scrolling. Some touch drivers instead

@@ -4,168 +4,209 @@
              xmlns:models="using:DigitalDashboard.Models"
              x:Class="DigitalDashboard.Views.ClockView"
              x:DataType="vm:ClockViewModel">
-
-	<Grid Background="#101319">
-            <Grid ColumnDefinitions="200,*"
-                  MaxWidth="960"
-                  HorizontalAlignment="Stretch"
-                  Margin="16"
-                  VerticalAlignment="Stretch">
-                <ScrollViewer x:Name="WeatherScroller"
-                              Grid.Column="0"
-                              Margin="0,0,16,0"
-                              Background="Transparent"
-                              IsScrollInertiaEnabled="True"
-                              VerticalScrollBarVisibility="Hidden"
-                              HorizontalScrollBarVisibility="Disabled">
-                <StackPanel
-                            HorizontalAlignment="Stretch"
-                            Spacing="16">
-                    <TextBlock Text="Weather"
-                               FontSize="18"
-                               FontWeight="SemiBold"
-                               Foreground="#F4F7FC"/>
-
-				<TextBlock Text="Add places to appsettings.json, then restart."
-	                       IsVisible="{Binding HasNoWeatherLocations}"
-	                       FontSize="16"
-	                       Foreground="#AAAAAA"
-	                       TextWrapping="Wrap"/>
-
-                <ItemsControl ItemsSource="{Binding WeatherLocations}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Spacing="16"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-					<ItemsControl.ItemTemplate>
-						<DataTemplate x:DataType="vm:WeatherLocationViewModel">
-                            <Border
-                                    Padding="16,14"
-                                    CornerRadius="18"
-                                    BorderBrush="#2A3547"
-                                    BorderThickness="1"
-                                    BoxShadow="0 8 24 0 #22000000">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                                        <GradientStop Offset="0" Color="#1D2939"/>
-                                        <GradientStop Offset="1" Color="#151C27"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-
-                                <StackPanel Spacing="10">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontSize="16"
-                                                   FontWeight="Medium"
-                                                   Foreground="#C2CDDD"
-                                                   TextTrimming="CharacterEllipsis"/>
-                                        <Ellipse Grid.Column="1"
-                                                 Width="6"
-                                                 Height="6"
-                                                 Margin="10,0,0,0"
-                                                 Fill="#7DD3FC"
-                                                 VerticalAlignment="Center"/>
-                                    </Grid>
-
-                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                        <TextBlock Text="{Binding Temperature}"
-                                                   FontSize="36"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="#F4F7FC"/>
-                                        <TextBlock Text="°C"
-                                                   FontSize="20"
-                                                   Foreground="#8DA4BF"
-                                                   Margin="0,9,0,0"/>
-                                    </StackPanel>
-
-                                    <TextBlock Text="{Binding Description}"
-                                               FontSize="14"
-                                               Foreground="#9FB1C5"
-                                               TextWrapping="Wrap"/>
-                                </StackPanel>
-                            </Border>
-						</DataTemplate>
-					</ItemsControl.ItemTemplate>
-				</ItemsControl>
-                </StackPanel>
-                </ScrollViewer>
-
-                <Grid Grid.Column="1"
-                      RowDefinitions="Auto,*"
-                      HorizontalAlignment="Stretch">
-                    <StackPanel Spacing="8"
-                                Margin="0,0,0,16"
-                                HorizontalAlignment="Stretch">
-                        <Viewbox Stretch="Uniform"
-                                 StretchDirection="DownOnly"
-                                 HorizontalAlignment="Center">
-                            <TextBlock Text="{Binding Time}"
-                                       FontSize="64"
-                                       FontWeight="Bold"
-                                       Foreground="White"
-                                       FontFamily="Consolas"/>
-                        </Viewbox>
-                        <TextBlock Text="{Binding Date}"
-                                   FontSize="18"
-                                   Foreground="#8F9BAE"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap"/>
+    <UserControl.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="#EAF0F7"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="#9BAAB9"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="TextBlock.muted">
+            <Setter Property="Foreground" Value="#9BAAB9"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="#191F28"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="12"/>
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="MinHeight" Value="48"/>
+            <Setter Property="MinWidth" Value="48"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Background" Value="#253140"/>
+            <Setter Property="Foreground" Value="#EAF0F7"/>
+        </Style>
+        <Style Selector="Button:disabled">
+            <Setter Property="Opacity" Value="0.8"/>
+        </Style>
+        <Style Selector="Button:disabled /template/ ContentPresenter">
+            <Setter Property="Background" Value="#253140"/>
+            <Setter Property="Foreground" Value="#9BAAB9"/>
+        </Style>
+        <Style Selector="Button.nav">
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+        <Style Selector="Button.nav.active">
+            <Setter Property="Background" Value="#00C7E8"/>
+            <Setter Property="Foreground" Value="#07222D"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="Button.nav.active /template/ ContentPresenter">
+            <Setter Property="Background" Value="#00C7E8"/>
+            <Setter Property="Foreground" Value="#07222D"/>
+        </Style>
+    </UserControl.Styles>
+    <Grid Background="#0E131B" RowDefinitions="36,*">
+        <Grid ColumnDefinitions="*,Auto" Margin="14,0">
+            <TextBlock Text="DIGITAL HOME" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="#8CDDED"/>
+            <TextBlock Grid.Column="1" Text="HOME OVERVIEW" Classes="label" VerticalAlignment="Center"/>
+        </Grid>
+        <Grid Grid.Row="1" ColumnDefinitions="104,*">
+            <Border Background="#151C25" Padding="6,8">
+                <Grid RowDefinitions="*,Auto">
+                    <StackPanel Spacing="8">
+                        <Button x:Name="OverviewButton" Classes="nav active" Content="Overview" Click="Navigate" Tag="Overview"/>
+                        <Button Classes="nav" Content="Climate" Click="Navigate" Tag="Climate"/>
+                        <Button Classes="nav" Content="Lighting" Click="Navigate" Tag="Lighting"/>
+                        <Button Classes="nav" Content="Security" Click="Navigate" Tag="Security"/>
                     </StackPanel>
-
-                    <Grid Grid.Row="1" RowDefinitions="Auto,*">
-                        <TextBlock Text="Upcoming Events"
-                                   Margin="0,0,0,16"
-                                   FontSize="18"
-                                   FontWeight="SemiBold"
-                                   Foreground="#F4F7FC"/>
-
-                        <ScrollViewer x:Name="EventsScroller"
-                                      Grid.Row="1"
-                                      Background="Transparent"
-                                      IsScrollInertiaEnabled="True"
-                                      VerticalScrollBarVisibility="Hidden"
-                                      HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl ItemsSource="{Binding CalendarEvents}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="12"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="models:CalendarEventModel">
-                                    <Border Background="#202936"
-                                            CornerRadius="12"
-                                            BorderBrush="#2A3547"
-                                            BorderThickness="1"
-                                            Padding="20,16">
-                                    <StackPanel Spacing="8">
-                                        <TextBlock Text="{Binding Start, StringFormat='{}{0:ddd dd MMM}'}"
-                                                   FontSize="13"
-                                                   Foreground="#9FB1C5"
-                                                   VerticalAlignment="Center"/>
-                                        <TextBlock Text="{Binding Title}"
-                                                   FontSize="17"
-                                                   FontWeight="Medium"
-                                                   Foreground="#F4F7FC"
-                                                   TextWrapping="Wrap"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        </ScrollViewer>
-
-                        <TextBlock Text="No upcoming events"
-                                   Grid.Row="1"
-                                   VerticalAlignment="Top"
-                                   Foreground="#F4F7FC"
-                                   Opacity="0.6"
-                                   IsVisible="{Binding HasNoCalendarEvents}"/>
+                    <TextBlock Grid.Row="1" Text="YOUR HOME&#10;AT A GLANCE" Classes="label" Margin="6,0,0,8"/>
+                </Grid>
+            </Border>
+            <Grid x:Name="OverviewPanel" Grid.Column="1" ColumnDefinitions="*,*,*" Margin="8,0,8,8">
+                <!-- Each column fits the 800 x 480 baseline without scaling touch targets. -->
+                <Grid RowDefinitions="126,*" Margin="0,0,4,0">
+                    <Border Classes="card">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="WELCOME HOME" Classes="label" Foreground="#55DDB4"/>
+                            <TextBlock Text="{Binding Time}" FontSize="44" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Date}" Classes="muted" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1" Classes="card" Margin="0,8,0,0">
+                        <Grid RowDefinitions="Auto,*">
+                            <TextBlock Text="UPCOMING AGENDA" Classes="label" Margin="0,0,0,10"/>
+                            <ScrollViewer x:Name="EventsScroller" Grid.Row="1" Background="Transparent" IsScrollInertiaEnabled="True"
+                                          VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                                <ItemsControl ItemsSource="{Binding CalendarEvents}">
+                                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="8"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:CalendarEventModel">
+                                            <Border Background="#212B37" CornerRadius="7" Padding="10" MinHeight="70" BorderBrush="#00C7E8" BorderThickness="3,0,0,0">
+                                                <StackPanel Spacing="5">
+                                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding DisplayTime}" FontSize="12" Foreground="#8CDDED"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <TextBlock Grid.Row="1" Text="No upcoming events" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasNoCalendarEvents}"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+                <Grid Grid.Column="1" RowDefinitions="*,158" Margin="4,0">
+                    <Border Classes="card">
+                        <Grid RowDefinitions="Auto,*,Auto">
+                            <TextBlock Text="LOCAL WEATHER" Classes="label" Margin="0,0,0,8"/>
+                            <ScrollViewer x:Name="WeatherScroller" Grid.Row="1" Background="Transparent" IsScrollInertiaEnabled="True"
+                                          VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="No weather location configured" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasNoWeatherLocations}"/>
+                                    <ItemsControl ItemsSource="{Binding WeatherLocations}">
+                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="12"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="vm:WeatherLocationViewModel">
+                                                <StackPanel Spacing="3">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                                        <TextBlock Text="{Binding Temperature}" FontSize="38" FontWeight="Bold"/>
+                                                        <TextBlock Text="°C" Foreground="#F5BC58" FontSize="20" Margin="0,6,0,0"/>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{Binding Description}" Classes="muted" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </ScrollViewer>
+                            <StackPanel Grid.Row="2" Spacing="6" Margin="0,8,0,0">
+                                <TextBlock Text="FORECAST · NOT CONNECTED" FontSize="10" Foreground="#9BAAB9"/>
+                                <UniformGrid Columns="4">
+                                    <TextBlock Text="+3h&#10;—" TextAlignment="Center" Classes="muted"/>
+                                    <TextBlock Text="+6h&#10;—" TextAlignment="Center" Classes="muted"/>
+                                    <TextBlock Text="+9h&#10;—" TextAlignment="Center" Classes="muted"/>
+                                    <TextBlock Text="+12h&#10;—" TextAlignment="Center" Classes="muted"/>
+                                </UniformGrid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Border Grid.Row="1" Classes="card" Margin="0,8,0,0">
+                        <Grid RowDefinitions="Auto,*,*" ColumnDefinitions="*,*">
+                            <TextBlock Grid.ColumnSpan="2" Text="SCENES · Not connected" FontSize="12" Foreground="#9BAAB9" Margin="0,0,0,6"/>
+                            <Button Grid.Row="1" Content="Home" IsEnabled="False" HorizontalAlignment="Stretch" Margin="0,0,3,3"/>
+                            <Button Grid.Row="1" Grid.Column="1" Content="Away" IsEnabled="False" HorizontalAlignment="Stretch" Margin="3,0,0,3"/>
+                            <Button Grid.Row="2" Content="Evening" IsEnabled="False" HorizontalAlignment="Stretch" Margin="0,3,3,0"/>
+                            <Button Grid.Row="2" Grid.Column="1" Content="Night" IsEnabled="False" HorizontalAlignment="Stretch" Margin="3,3,0,0"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+                <Grid Grid.Column="2" RowDefinitions="132,100,*" Margin="4,0,0,0">
+                    <Border Classes="card">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="THERMOSTAT" Classes="label"/>
+                            <Grid ColumnDefinitions="48,*,48">
+                                <Button Content="−" FontSize="24" IsEnabled="False" AutomationProperties.Name="Lower temperature"/>
+                                <TextBlock Grid.Column="1" Text="—°C" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Button Grid.Column="2" Content="+" FontSize="24" IsEnabled="False" AutomationProperties.Name="Raise temperature"/>
+                            </Grid>
+                            <TextBlock Text="Not connected" Classes="muted"/>
+                        </StackPanel>
+                    </Border>
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,8,0,0">
+                        <Border Classes="card" Margin="0,0,4,0" Padding="10">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="LIGHTS" Classes="label" Foreground="#F5BC58"/>
+                                <TextBlock Text="Not&#10;connected" Classes="muted"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Classes="card" Margin="4,0,0,0" Padding="10">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="DOOR" Classes="label" Foreground="#8CDDED"/>
+                                <TextBlock Text="Not&#10;connected" Classes="muted"/>
+                            </StackPanel>
+                        </Border>
                     </Grid>
+                    <Border Grid.Row="2" Classes="card" Margin="0,8,0,0">
+                        <Grid RowDefinitions="Auto,*,48">
+                            <TextBlock Text="SPOTIFY" Classes="label" Foreground="#55DDB4"/>
+                            <Grid Grid.Row="1" ColumnDefinitions="40,*" Margin="0,6">
+                                <Border Background="#253140" CornerRadius="6" Height="40" VerticalAlignment="Center">
+                                    <TextBlock Text="♫" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#8CDDED"/>
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                                    <TextBlock Text="Your music" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Not connected" Classes="muted" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Grid.Row="2" ColumnDefinitions="*,*,*">
+                                <Button Content="|‹" IsEnabled="False" Margin="0,0,3,0" HorizontalAlignment="Stretch" AutomationProperties.Name="Previous track"/>
+                                <Button Grid.Column="1" Content="▶" IsEnabled="False" Margin="3,0" HorizontalAlignment="Stretch" AutomationProperties.Name="Play music"/>
+                                <Button Grid.Column="2" Content="›|" IsEnabled="False" Margin="3,0,0,0" HorizontalAlignment="Stretch" AutomationProperties.Name="Next track"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
                 </Grid>
             </Grid>
-
-	</Grid>
+            <Border x:Name="FeaturePanel" Grid.Column="1" Classes="card" Margin="8,0,8,8" IsVisible="False">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16" MaxWidth="400">
+                    <TextBlock x:Name="FeatureTitle" FontSize="28" FontWeight="Bold" TextAlignment="Center"/>
+                    <TextBlock Text="Not connected" Foreground="#8CDDED" FontSize="18" TextAlignment="Center"/>
+                    <TextBlock x:Name="FeatureDescription" TextWrapping="Wrap" TextAlignment="Center" Classes="muted"/>
+                    <Button Content="Back to overview" Click="Navigate" Tag="Overview" HorizontalAlignment="Center" Padding="20,0"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
 </UserControl>
