@@ -129,7 +129,7 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
         
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Spotify request failed: {ex}");
+            Console.Error.WriteLine($"Spotify request failed: {ex}");
 
             if (_disposed) 
                 return;
