@@ -104,15 +104,27 @@ public class SpotifyAuthenticationService
     {
         var token = await AuthenticateAsync();
 
+        if (string.IsNullOrWhiteSpace(token.RefreshToken))
+        {
+            throw new InvalidOperationException(
+                "Spotify refresh token is missing. Please authenticate again.");
+        }
+
+        string refreshToken = token.RefreshToken;
+
         var authenticator = new PKCEAuthenticator(_clientId, token);
 
         authenticator.TokenRefreshed += (_, refreshedToken) =>
         {
             try
             {
-                if (string.IsNullOrEmpty(refreshedToken.RefreshToken))
+                if (string.IsNullOrWhiteSpace(refreshedToken.RefreshToken))
                 {
-                    refreshedToken.RefreshToken = token.RefreshToken;
+                    refreshedToken.RefreshToken = refreshToken;
+                }
+                else
+                {
+                    refreshToken = refreshedToken.RefreshToken;
                 }
 
                 var json = JsonSerializer.Serialize(refreshedToken);
@@ -121,7 +133,6 @@ public class SpotifyAuthenticationService
                 File.WriteAllText(temporaryPath, json);
                 File.Move(temporaryPath, _tokenPath, true);
 
-                token = refreshedToken;
             }
             catch (Exception ex)
             {
