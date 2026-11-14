@@ -25,5 +25,6 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="Google.Apis.Calendar.v3" Version="1.78.0.4320" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="11.0.0" />
   </ItemGroup>
 </Project>

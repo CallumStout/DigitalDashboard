@@ -2,15 +2,15 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
+using DigitalDashboard.Models;
+using DigitalDashboard.Services;
 using DigitalDashboard.ViewModels;
 using DigitalDashboard.Views;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using DigitalDashboard.Services;
 using System;
-using System.Net.Http;
-using DigitalDashboard.Models;
 using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 
 namespace DigitalDashboard
@@ -43,6 +43,11 @@ namespace DigitalDashboard
                 });
                 services.AddSingleton<IWeatherService, WeatherService>();
                 services.AddSingleton<ICalendarService, GoogleCalendarService>();
+                services.AddHttpClient<ISmartPlugService, TapoSmartPlugService>(client =>
+                {
+                    client.BaseAddress = new Uri("http://127.0.0.1:8765/");
+                    client.Timeout = TimeSpan.FromSeconds(10);
+                });
 
                 // Register our ViewModel
                 services.AddTransient<ClockViewModel>();

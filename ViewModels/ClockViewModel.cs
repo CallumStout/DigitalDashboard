@@ -38,11 +38,13 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
     public IReadOnlyList<WeatherLocationViewModel> WeatherLocations { get; }
 
+    public SmartPlugViewModel SmartPlug { get; }
+
     public bool HasNoWeatherLocations => WeatherLocations.Count == 0;
 
     public bool HasNoCalendarEvents => CalendarEvents.Count == 0;
 
-    public ClockViewModel(IClockService clockService, IWeatherService weatherService, AppSettings settings, ICalendarService calendarService)
+    public ClockViewModel(IClockService clockService, IWeatherService weatherService, AppSettings settings, ICalendarService calendarService, ISmartPlugService smartPlugService)
     {
         _clockService = clockService;
         _weatherService = weatherService;
@@ -51,6 +53,8 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         WeatherLocations = settings.WeatherLocations
             .Select(location => new WeatherLocationViewModel(location))
             .ToArray();
+
+        SmartPlug = new SmartPlugViewModel(smartPlugService);
 
         _timer = new DispatcherTimer
         {
@@ -86,7 +90,7 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
     {
         var now = _clockService.GetCurrentTime();
 
-        Time = now.ToString("HH:mm");
+        Time = now.ToString("HH:mm:ss");
         Date = now.ToString("dddd, dd MMMM");
     }
 
@@ -180,6 +184,7 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         _timer.Stop();
         _weatherTimer.Stop();
         _calendarTimer.Stop();
+        SmartPlug.Dispose();
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
     }

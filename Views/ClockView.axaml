@@ -79,7 +79,9 @@
                     <Border Classes="card">
                         <StackPanel Spacing="4">
                             <TextBlock Text="WELCOME HOME" Classes="label" Foreground="#55DDB4"/>
-                            <TextBlock Text="{Binding Time}" FontSize="44" FontWeight="Bold"/>
+                            <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left">
+                                <TextBlock Text="{Binding Time}" FontSize="44" FontWeight="Bold"/>
+                            </Viewbox>
                             <TextBlock Text="{Binding Date}" Classes="muted" TextWrapping="Wrap"/>
                         </StackPanel>
                     </Border>
@@ -108,7 +110,7 @@
                 </Grid>
                 <Grid Grid.Column="1" RowDefinitions="*,158" Margin="4,0">
                     <Border Classes="card">
-                        <Grid RowDefinitions="Auto,*,Auto">
+                        <Grid RowDefinitions="Auto,*">
                             <TextBlock Text="LOCAL WEATHER" Classes="label" Margin="0,0,0,8"/>
                             <ScrollViewer x:Name="WeatherScroller" Grid.Row="1" Background="Transparent" IsScrollInertiaEnabled="True"
                                           VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
@@ -131,24 +133,20 @@
                                     </ItemsControl>
                                 </StackPanel>
                             </ScrollViewer>
-                            <StackPanel Grid.Row="2" Spacing="6" Margin="0,8,0,0">
-                                <TextBlock Text="FORECAST · NOT CONNECTED" FontSize="10" Foreground="#9BAAB9"/>
-                                <UniformGrid Columns="4">
-                                    <TextBlock Text="+3h&#10;—" TextAlignment="Center" Classes="muted"/>
-                                    <TextBlock Text="+6h&#10;—" TextAlignment="Center" Classes="muted"/>
-                                    <TextBlock Text="+9h&#10;—" TextAlignment="Center" Classes="muted"/>
-                                    <TextBlock Text="+12h&#10;—" TextAlignment="Center" Classes="muted"/>
-                                </UniformGrid>
-                            </StackPanel>
                         </Grid>
                     </Border>
                     <Border Grid.Row="1" Classes="card" Margin="0,8,0,0">
-                        <Grid RowDefinitions="Auto,*,*" ColumnDefinitions="*,*">
-                            <TextBlock Grid.ColumnSpan="2" Text="SCENES · Not connected" FontSize="12" Foreground="#9BAAB9" Margin="0,0,0,6"/>
-                            <Button Grid.Row="1" Content="Home" IsEnabled="False" HorizontalAlignment="Stretch" Margin="0,0,3,3"/>
-                            <Button Grid.Row="1" Grid.Column="1" Content="Away" IsEnabled="False" HorizontalAlignment="Stretch" Margin="3,0,0,3"/>
-                            <Button Grid.Row="2" Content="Evening" IsEnabled="False" HorizontalAlignment="Stretch" Margin="0,3,3,0"/>
-                            <Button Grid.Row="2" Grid.Column="1" Content="Night" IsEnabled="False" HorizontalAlignment="Stretch" Margin="3,3,0,0"/>
+                        <Grid RowDefinitions="Auto,Auto,*,48">
+                            <TextBlock Text="SMART HOME" Classes="label" Foreground="#8BADED"/>
+                            <TextBlock Grid.Row="1" Text="{Binding SmartPlug.Name}" FontSize="17" FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
+                            <TextBlock Grid.Row="2" Text="{Binding SmartPlug.Status}" Classes="muted" VerticalAlignment="Center"/>
+                            <Grid Grid.Row="3" ColumnDefinitions="*,56">
+                                <Button Content="{Binding SmartPlug.PowerButtonText}" Command="{Binding SmartPlug.ToggleCommand}"
+                                        HorizontalAlignment="Stretch" FontSize="12" Padding="4,0" Margin="0,0,6,0"/>
+                                <Button Grid.Column="1" Content="Retry" Command="{Binding SmartPlug.RefreshCommand}"
+                                        HorizontalAlignment="Stretch" FontSize="12" Padding="4,0" AutomationProperties.Name="Refresh smart plug status"/>
+                            </Grid>
                         </Grid>
                     </Border>
                 </Grid>

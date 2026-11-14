@@ -5,7 +5,7 @@ Google Calendar events. Built with .NET 10.
 
 The dark home overview is designed for 7-inch landscape displays at 800×480 and
 1024×600. A persistent left navigation rail sits beside three flexible columns:
-clock and agenda, weather and scenes, and home controls and music. Buttons have a
+clock and agenda, weather and smart plug, and home controls and music. Buttons have a
 minimum 48×48 logical-pixel touch target, with spacing between adjacent controls.
 Use native display resolution and check OS display scaling on the target device.
 
@@ -14,10 +14,30 @@ connections. Weather and agenda lists scroll independently with touch inertia;
 mouse dragging also works for touch drivers that report mouse input. Calendar
 entries include their start time or an all-day label.
 
-Thermostat, lights, door, Spotify, scenes, and forecast slots are clearly marked
-as not connected. Playback, thermostat, and scene buttons are disabled until
+Thermostat, lights, door, and Spotify are clearly marked
+as not connected. Playback and thermostat buttons are disabled until
 integrations are added. Climate, Lighting, and Security navigation opens a
 placeholder page with a working return button. No device status is simulated.
+
+## Smart plug
+
+The Smart Home card uses a local HTTP bridge at `http://127.0.0.1:8765/`.
+This is a bridge API, not a direct connection to the Tapo device. The bridge must
+run on the same machine as the dashboard (on the Pi when deployed there).
+The typed client is registered with `AddHttpClient`, supplied by the
+`Microsoft.Extensions.Http` package, with a 10-second timeout.
+
+Expected endpoints:
+
+- `GET /api/plug`: JSON such as `{"name":"Desk lamp","isOn":false}`.
+  The boolean `isOn` is required; missing or malformed state is treated as unavailable.
+- `POST /api/plug/on` and `POST /api/plug/off`: return a successful HTTP status.
+  The dashboard then fetches the state again to display the confirmed result.
+
+State refreshes on startup and every 30 seconds. The Retry button refreshes it
+manually. Power controls are disabled until a valid state has loaded and while
+requests are running. Failed requests show an unavailable status; a successful
+refresh restores control. Pending requests and polling stop when the app closes.
 
 ## Run locally
 
