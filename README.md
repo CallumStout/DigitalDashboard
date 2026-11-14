@@ -34,7 +34,9 @@ Previous, play/pause, and next controls keep 48-pixel minimum touch targets with
 the existing card margins. Larger artwork fills the card behind a dark gradient,
 with track details and controls overlaid inside the padding. Long track names
 wrap to two lines and then truncate.
-Controls are disabled during requests and when no track is available. Open Spotify
+Controls are disabled during user playback commands and when no track is available.
+Routine polling leaves buttons enabled; a command pressed during a poll waits for
+that read to finish instead of being dropped. Open Spotify
 on a playback device to start listening. Playback refreshes every five seconds;
 connection failures show an offline state and retry automatically.
 

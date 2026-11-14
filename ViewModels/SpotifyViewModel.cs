@@ -18,6 +18,8 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
     private readonly HttpClient _httpClient;
     private readonly DispatcherTimer _timer;
     private readonly CancellationTokenSource _lifetime = new();
+    private readonly SemaphoreSlim _requests = new(1, 1);
+    private bool _isRefreshing;
     private readonly CancellationToken _token;
     private string? _artworkUrl;
     private DateTime _artworkRetryAfter;
@@ -79,13 +81,18 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
     // context, so there is no worker loop or per-property dispatcher queue.
     private async Task UpdateAsync(Func<Task>? command = null)
     {
-        if (_disposed || IsLoading) 
+        if (_disposed || IsLoading || (command == null && _isRefreshing))
             return;
-        
-        IsLoading = true;
-        
+
+        // Poll quietly. A user command can wait for the current read without
+        // being dropped, while only user actions change button appearance.
+        if (command == null) _isRefreshing = true;
+        else IsLoading = true;
+        var acquired = false;
         try
         {
+            await _requests.WaitAsync(_token);
+            acquired = true;
             if (command != null)
             {
                 Status = "Updating…";
@@ -133,7 +140,9 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
         }
         finally
         {
-            if (!_disposed) IsLoading = false;
+            if (acquired) _requests.Release();
+            if (command == null) _isRefreshing = false;
+            else if (!_disposed) IsLoading = false;
         }
     }
 
