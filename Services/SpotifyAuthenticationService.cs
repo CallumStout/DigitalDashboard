@@ -110,13 +110,18 @@ public class SpotifyAuthenticationService
         {
             try
             {
+                if (string.IsNullOrEmpty(refreshedToken.RefreshToken))
+                {
+                    refreshedToken.RefreshToken = token.RefreshToken;
+                }
+
                 var json = JsonSerializer.Serialize(refreshedToken);
                 var temporaryPath = _tokenPath + ".tmp";
 
                 File.WriteAllText(temporaryPath, json);
                 File.Move(temporaryPath, _tokenPath, true);
 
-                Console.WriteLine("Spotify: Token refreshed and saved successfully.");
+                token = refreshedToken;
             }
             catch (Exception ex)
             {
