@@ -68,12 +68,15 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
 
     [RelayCommand]
     private Task RefreshAsync() => UpdateAsync();
+    
     [RelayCommand(CanExecute = nameof(CanControl))]
     private Task TogglePlaybackAsync() => CanControl()
         ? UpdateAsync(IsPlaying ? _spotifyService.PauseAsync : _spotifyService.ResumeAsync)
         : Task.CompletedTask;
+    
     [RelayCommand(CanExecute = nameof(CanControl))]
     private Task NextTrackAsync() => CanControl() ? UpdateAsync(_spotifyService.NextTrackAsync) : Task.CompletedTask;
+    
     [RelayCommand(CanExecute = nameof(CanControl))]
     private Task PreviousTrackAsync() => CanControl() ? UpdateAsync(_spotifyService.PreviousTrackAsync) : Task.CompletedTask;
 
@@ -87,7 +90,9 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
         // Poll quietly. A user command can wait for the current read without
         // being dropped, while only user actions change button appearance.
         if (command == null) _isRefreshing = true;
+        
         else IsLoading = true;
+        
         var acquired = false;
         try
         {

@@ -106,11 +106,22 @@ public class SpotifyAuthenticationService
 
         var authenticator = new PKCEAuthenticator(_clientId, token);
 
-        authenticator.TokenRefreshed += async (_, refreshedToken) =>
+        authenticator.TokenRefreshed += (_, refreshedToken) =>
         {
-            await File.WriteAllTextAsync(
-                _tokenPath,
-                JsonSerializer.Serialize(refreshedToken));
+            try
+            {
+                var json = JsonSerializer.Serialize(refreshedToken);
+                var temporaryPath = _tokenPath + ".tmp";
+
+                File.WriteAllText(temporaryPath, json);
+                File.Move(temporaryPath, _tokenPath, true);
+
+                Console.WriteLine("Spotify: Token refreshed and saved successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Spotify token save failed: {ex}");
+            }
         };
 
         var config = SpotifyClientConfig.CreateDefault()

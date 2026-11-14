@@ -133,7 +133,7 @@
                 <Grid Grid.Column="1" RowDefinitions="*,158" Margin="4,0">
                     <Border Classes="card">
                         <Grid RowDefinitions="Auto,*">
-                            <TextBlock Text="LOCAL WEATHER" Classes="label" Margin="0,0,0,8"/>
+                            <TextBlock Text="WEATHER" Classes="label" Margin="0,0,0,8"/>
                             <ScrollViewer x:Name="WeatherScroller" Grid.Row="1" Background="Transparent" IsScrollInertiaEnabled="True"
                                           VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
                                 <StackPanel Spacing="8">
