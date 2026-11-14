@@ -13,6 +13,7 @@ public partial class ClockView : UserControl
         InitializeComponent();
         EnableMouseDragScrolling(WeatherScroller);
         EnableMouseDragScrolling(EventsScroller);
+        EnableMouseDragScrolling(PlugsScroller);
     }
 
     private void Navigate(object? sender, RoutedEventArgs e)
@@ -20,12 +21,12 @@ public partial class ClockView : UserControl
         if (sender is not Button { Tag: string section }) return;
 
         OverviewPanel.IsVisible = section == "Overview";
-        FeaturePanel.IsVisible = !OverviewPanel.IsVisible;
+        PlugsPanel.IsVisible = section == "Plugs";
+        FeaturePanel.IsVisible = !OverviewPanel.IsVisible && !PlugsPanel.IsVisible;
         FeatureTitle.Text = section;
         FeatureDescription.Text = section switch
         {
             "Climate" => "Your thermostat and climate controls will appear here once connected.",
-            "Lighting" => "Your lights and room scenes will appear here once connected.",
             "Security" => "Your door locks and security devices will appear here once connected.",
             _ => string.Empty
         };
@@ -46,6 +47,10 @@ public partial class ClockView : UserControl
 
         viewer.PointerPressed += (_, e) =>
         {
+            // Keep power and refresh buttons clickable inside the plugs list.
+            if (e.Source is Visual source && source.FindAncestorOfType<Button>(includeSelf: true) != null)
+                return;
+
             if (e.Pointer.Type != PointerType.Mouse
                 || !e.GetCurrentPoint(viewer).Properties.IsLeftButtonPressed
                 || viewer.Extent.Height <= viewer.Viewport.Height)

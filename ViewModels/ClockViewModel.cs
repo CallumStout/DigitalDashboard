@@ -38,23 +38,34 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
     public IReadOnlyList<WeatherLocationViewModel> WeatherLocations { get; }
 
-    public SmartPlugViewModel SmartPlug { get; }
+    public IReadOnlyList<SmartPlugViewModel> SmartPlugs { get; }
+    public bool HasNoSmartPlugs => SmartPlugs.Count == 0;
+    public string PlugSummary => SmartPlugs.Count == 0 ? "No plugs connected" :
+        $"{SmartPlugs.Count(p => p.HasState && p.IsOn)} on · {SmartPlugs.Count(p => p.HasState && !p.IsOn)} off";
+    public string PlugAvailability => SmartPlugs.Count == 0 ? "Your plugs will appear here" :
+        $"{SmartPlugs.Count} configured · {SmartPlugs.Count(p => !p.HasState)} unknown";
+
+    public SpotifyViewModel Spotify { get; }
 
     public bool HasNoWeatherLocations => WeatherLocations.Count == 0;
 
     public bool HasNoCalendarEvents => CalendarEvents.Count == 0;
 
-    public ClockViewModel(IClockService clockService, IWeatherService weatherService, AppSettings settings, ICalendarService calendarService, ISmartPlugService smartPlugService)
+    public ClockViewModel(IClockService clockService, IWeatherService weatherService, AppSettings settings, ICalendarService calendarService, IEnumerable<ISmartPlugService> smartPlugServices, SpotifyViewModel spotifyViewModel)
     {
         _clockService = clockService;
         _weatherService = weatherService;
         _calendarService = calendarService;
 
+        Spotify = spotifyViewModel;
+
         WeatherLocations = settings.WeatherLocations
             .Select(location => new WeatherLocationViewModel(location))
             .ToArray();
 
-        SmartPlug = new SmartPlugViewModel(smartPlugService);
+        SmartPlugs = smartPlugServices.Select(service => new SmartPlugViewModel(service)).ToArray();
+        foreach (var plug in SmartPlugs)
+            plug.PropertyChanged += OnPlugChanged;
 
         _timer = new DispatcherTimer
         {
@@ -173,6 +184,15 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(HasNoCalendarEvents));
     }
 
+    private void OnPlugChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(SmartPlugViewModel.HasState) or nameof(SmartPlugViewModel.IsOn))
+        {
+            OnPropertyChanged(nameof(PlugSummary));
+            OnPropertyChanged(nameof(PlugAvailability));
+        }
+    }
+
     public void Dispose()
     {
         if (_isDisposed)
@@ -184,7 +204,11 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         _timer.Stop();
         _weatherTimer.Stop();
         _calendarTimer.Stop();
-        SmartPlug.Dispose();
+        foreach (var plug in SmartPlugs)
+        {
+            plug.PropertyChanged -= OnPlugChanged;
+            plug.Dispose();
+        }
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
     }

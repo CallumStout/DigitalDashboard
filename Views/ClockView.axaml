@@ -67,7 +67,7 @@
                     <StackPanel Spacing="8">
                         <Button x:Name="OverviewButton" Classes="nav active" Content="Overview" Click="Navigate" Tag="Overview"/>
                         <Button Classes="nav" Content="Climate" Click="Navigate" Tag="Climate"/>
-                        <Button Classes="nav" Content="Lighting" Click="Navigate" Tag="Lighting"/>
+                        <Button Classes="nav" Content="Plugs" Click="Navigate" Tag="Plugs"/>
                         <Button Classes="nav" Content="Security" Click="Navigate" Tag="Security"/>
                     </StackPanel>
                     <TextBlock Grid.Row="1" Text="YOUR HOME&#10;AT A GLANCE" Classes="label" Margin="6,0,0,8"/>
@@ -137,16 +137,10 @@
                     </Border>
                     <Border Grid.Row="1" Classes="card" Margin="0,8,0,0">
                         <Grid RowDefinitions="Auto,Auto,*,48">
-                            <TextBlock Text="SMART HOME" Classes="label" Foreground="#8BADED"/>
-                            <TextBlock Grid.Row="1" Text="{Binding SmartPlug.Name}" FontSize="17" FontWeight="SemiBold"
-                                       TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
-                            <TextBlock Grid.Row="2" Text="{Binding SmartPlug.Status}" Classes="muted" VerticalAlignment="Center"/>
-                            <Grid Grid.Row="3" ColumnDefinitions="*,56">
-                                <Button Content="{Binding SmartPlug.PowerButtonText}" Command="{Binding SmartPlug.ToggleCommand}"
-                                        HorizontalAlignment="Stretch" FontSize="12" Padding="4,0" Margin="0,0,6,0"/>
-                                <Button Grid.Column="1" Content="Retry" Command="{Binding SmartPlug.RefreshCommand}"
-                                        HorizontalAlignment="Stretch" FontSize="12" Padding="4,0" AutomationProperties.Name="Refresh smart plug status"/>
-                            </Grid>
+                            <TextBlock Text="PLUG OVERVIEW" Classes="label" Foreground="#8CDDED"/>
+                            <TextBlock Grid.Row="1" Text="{Binding PlugSummary}" FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0"/>
+                            <TextBlock Grid.Row="2" Text="{Binding PlugAvailability}" Classes="muted" VerticalAlignment="Center"/>
+                            <Button Grid.Row="3" Content="View plugs" Click="Navigate" Tag="Plugs" HorizontalAlignment="Stretch"/>
                         </Grid>
                     </Border>
                 </Grid>
@@ -176,26 +170,82 @@
                             </StackPanel>
                         </Border>
                     </Grid>
-                    <Border Grid.Row="2" Classes="card" Margin="0,8,0,0">
-                        <Grid RowDefinitions="Auto,*,48">
-                            <TextBlock Text="SPOTIFY" Classes="label" Foreground="#55DDB4"/>
-                            <Grid Grid.Row="1" ColumnDefinitions="40,*" Margin="0,6">
-                                <Border Background="#253140" CornerRadius="6" Height="40" VerticalAlignment="Center">
-                                    <TextBlock Text="♫" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#8CDDED"/>
-                                </Border>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                                    <TextBlock Text="Your music" FontWeight="SemiBold"/>
-                                    <TextBlock Text="Not connected" Classes="muted" TextWrapping="Wrap"/>
+                    <Border Grid.Row="2" Classes="card" Margin="0,8,0,0" Background="#192621" Padding="0" ClipToBounds="True">
+                        <Grid>
+                            <Image Source="{Binding Spotify.AlbumArtwork}" Stretch="UniformToFill"
+                                   HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            <TextBlock Text="♫" IsVisible="{Binding !Spotify.HasArtwork}" FontSize="64"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#38634B"/>
+                            <Border IsHitTestVisible="False">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+                                        <GradientStop Offset="0" Color="#B0000000"/>
+                                        <GradientStop Offset="0.35" Color="#20000000"/>
+                                        <GradientStop Offset="0.65" Color="#A0000000"/>
+                                        <GradientStop Offset="1" Color="#F0101814"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                            <Grid RowDefinitions="Auto,*,Auto,48" Margin="12">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="♫  SPOTIFY" Classes="label" Foreground="#1ED760"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Spotify.Status}" FontSize="11" Foreground="#EAF0F7"/>
+                                </Grid>
+                                <StackPanel Grid.Row="2" Margin="0,8,0,10">
+                                    <TextBlock Text="{Binding Spotify.TrackName}" FontSize="16" FontWeight="SemiBold"
+                                               TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding Spotify.ArtistName}" FontSize="13" Foreground="#D7E2DC"
+                                               TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
                                 </StackPanel>
-                            </Grid>
-                            <Grid Grid.Row="2" ColumnDefinitions="*,*,*">
-                                <Button Content="|‹" IsEnabled="False" Margin="0,0,3,0" HorizontalAlignment="Stretch" AutomationProperties.Name="Previous track"/>
-                                <Button Grid.Column="1" Content="▶" IsEnabled="False" Margin="3,0" HorizontalAlignment="Stretch" AutomationProperties.Name="Play music"/>
-                                <Button Grid.Column="2" Content="›|" IsEnabled="False" Margin="3,0,0,0" HorizontalAlignment="Stretch" AutomationProperties.Name="Next track"/>
+                                <Grid Grid.Row="3" ColumnDefinitions="*,*,*">
+                                    <Button Content="|‹" Command="{Binding Spotify.PreviousTrackCommand}" Margin="0,0,4,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Previous track"/>
+                                    <Button Grid.Column="1" Content="{Binding Spotify.PlaybackIcon}" Command="{Binding Spotify.TogglePlaybackCommand}" Margin="4,0" HorizontalAlignment="Stretch" FontSize="20" Background="#1ED760" Foreground="#092416" CornerRadius="24" AutomationProperties.Name="{Binding Spotify.PlaybackLabel}"/>
+                                    <Button Grid.Column="2" Content="›|" Command="{Binding Spotify.NextTrackCommand}" Margin="4,0,0,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Next track"/>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </Border>
                 </Grid>
+            </Grid>
+            <Grid x:Name="PlugsPanel" Grid.Column="1" Margin="8,0,8,8" RowDefinitions="Auto,*" IsVisible="False">
+                <Border Classes="card" Margin="0,0,0,8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="SMART PLUGS" FontSize="22" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding PlugAvailability}" Classes="muted"/>
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding PlugSummary}" FontSize="18" Foreground="#8CDDED" VerticalAlignment="Center"/>
+                    </Grid>
+                </Border>
+                <ScrollViewer x:Name="PlugsScroller" Grid.Row="1" Background="Transparent" IsScrollInertiaEnabled="True"
+                              VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding SmartPlugs}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate><StackPanel Spacing="8"/></ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SmartPlugViewModel">
+                                <Border Classes="card" MinHeight="96">
+                                    <Grid ColumnDefinitions="*,150,100">
+                                        <StackPanel Spacing="6" VerticalAlignment="Center" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding Name}" FontSize="19" FontWeight="SemiBold"
+                                                       TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Status}" Classes="muted"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Content="{Binding PowerButtonText}" Command="{Binding ToggleCommand}"
+                                                HorizontalAlignment="Stretch" VerticalAlignment="Center" MinHeight="56" Margin="0,0,8,0" Padding="8,0"
+                                                AutomationProperties.Name="{Binding Name, StringFormat='Change power for {0}'}"/>
+                                        <Button Grid.Column="2" Content="Refresh" Command="{Binding RefreshCommand}"
+                                                HorizontalAlignment="Stretch" VerticalAlignment="Center" MinHeight="56" Padding="8,0"
+                                                AutomationProperties.Name="{Binding Name, StringFormat='Refresh status for {0}'}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+                <TextBlock Grid.Row="1" IsVisible="{Binding HasNoSmartPlugs}" Text="No plugs connected yet" Classes="muted"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
             <Border x:Name="FeaturePanel" Grid.Column="1" Classes="card" Margin="8,0,8,8" IsVisible="False">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16" MaxWidth="400">

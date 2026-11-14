@@ -22,7 +22,6 @@ namespace DigitalDashboard
             AvaloniaXamlLoader.Load(this);
         }
 
-
         public override void OnFrameworkInitializationCompleted()
         {
             if (ApplicationLifetime is
@@ -49,8 +48,15 @@ namespace DigitalDashboard
                     client.Timeout = TimeSpan.FromSeconds(10);
                 });
 
+                // Spotify services
+                services.AddSingleton<SpotifyAuthenticationService>(_ =>
+                    new SpotifyAuthenticationService(LoadSpotifyClientId()));
+
+                services.AddSingleton<ISpotifyService, SpotifyService>();
+
                 // Register our ViewModel
                 services.AddTransient<ClockViewModel>();
+                services.AddSingleton<SpotifyViewModel>();
 
                 var serviceProvider = services.BuildServiceProvider();
 
@@ -70,6 +76,18 @@ namespace DigitalDashboard
             base.OnFrameworkInitializationCompleted();
         }
 
+        private static string LoadSpotifyClientId()
+        {
+            var settingsPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "DigitalDashboard",
+                "spotify-settings.json");
+
+            using var settings = JsonDocument.Parse(File.ReadAllText(settingsPath));
+
+            return settings.RootElement.GetProperty("ClientId").GetString()
+                ?? throw new InvalidDataException("Spotify Client ID is missing.");
+        }
 
         private static AppSettings LoadSettings()
         {
@@ -106,14 +124,12 @@ namespace DigitalDashboard
             return settings;
         }
 
-
         private void DisableAvaloniaDataAnnotationValidation()
         {
             // Get an array of plugins to remove
             var dataValidationPluginsToRemove =
                 BindingPlugins.DataValidators.OfType<DataAnnotationsValidationPlugin>().ToArray();
 
-            // remove each entry found
             foreach (var plugin in dataValidationPluginsToRemove)
             {
                 BindingPlugins.DataValidators.Remove(plugin);

@@ -5,7 +5,7 @@ Google Calendar events. Built with .NET 10.
 
 The dark home overview is designed for 7-inch landscape displays at 800×480 and
 1024×600. A persistent left navigation rail sits beside three flexible columns:
-clock and agenda, weather and smart plug, and home controls and music. Buttons have a
+clock and agenda, weather and plug summary, and home controls and music. Buttons have a
 minimum 48×48 logical-pixel touch target, with spacing between adjacent controls.
 Use native display resolution and check OS display scaling on the target device.
 
@@ -14,14 +14,35 @@ connections. Weather and agenda lists scroll independently with touch inertia;
 mouse dragging also works for touch drivers that report mouse input. Calendar
 entries include their start time or an all-day label.
 
-Thermostat, lights, door, and Spotify are clearly marked
-as not connected. Playback and thermostat buttons are disabled until
-integrations are added. Climate, Lighting, and Security navigation opens a
+Thermostat, lights, and door are clearly marked
+as not connected. Thermostat buttons are disabled until
+integrations are added. Climate and Security navigation opens a
 placeholder page with a working return button. No device status is simulated.
+
+## Spotify card
+
+The existing Spotify connection supplies the current track, artists, and playback
+state. Album artwork downloads asynchronously into an Avalonia bitmap, reuses the
+current cover while its URL is unchanged, and falls back to a music icon if missing
+or unavailable. Downloads are buffered before bitmap decoding on the UI thread;
+failed covers are retried at most once per minute. A UI dispatcher timer drives
+refreshes. Playback requests cannot overlap; artwork loads independently so a
+slow cover download does not disable the transport controls. Stale downloads
+cannot replace the current track's cover.
+
+Previous, play/pause, and next controls keep 48-pixel minimum touch targets within
+the existing card margins. Larger artwork fills the card behind a dark gradient,
+with track details and controls overlaid inside the padding. Long track names
+wrap to two lines and then truncate.
+Controls are disabled during requests and when no track is available. Open Spotify
+on a playback device to start listening. Playback refreshes every five seconds;
+connection failures show an offline state and retry automatically.
 
 ## Smart plug
 
-The Smart Home card uses a local HTTP bridge at `http://127.0.0.1:8765/`.
+The Plugs page replaces Lighting and shows a vertically scrollable list with independent power and refresh controls (56 pixels high). The homepage summary shows confirmed on/off counts and unknown states, with a View plugs shortcut. Each registered ISmartPlugService gets its own card and polling lifecycle. The current registration connects one plug; additional physical plugs need separate service connections or a bridge/service extension for discovery and per-device addressing. No multi-device API is assumed.
+
+The existing plug connection uses a local HTTP bridge at `http://127.0.0.1:8765/`.
 This is a bridge API, not a direct connection to the Tapo device. The bridge must
 run on the same machine as the dashboard (on the Pi when deployed there).
 The typed client is registered with `AddHttpClient`, supplied by the
@@ -34,7 +55,7 @@ Expected endpoints:
 - `POST /api/plug/on` and `POST /api/plug/off`: return a successful HTTP status.
   The dashboard then fetches the state again to display the confirmed result.
 
-State refreshes on startup and every 30 seconds. The Retry button refreshes it
+State refreshes on startup and every 30 seconds. Each Refresh button refreshes its plug
 manually. Power controls are disabled until a valid state has loaded and while
 requests are running. Failed requests show an unavailable status; a successful
 refresh restores control. Pending requests and polling stop when the app closes.
