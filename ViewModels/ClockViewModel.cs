@@ -1,9 +1,12 @@
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DigitalDashboard.Models;
 using DigitalDashboard.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -19,12 +22,16 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
     private readonly IClockService _clockService;
     private readonly IWeatherService _weatherService;
     private readonly ICalendarService _calendarService;
+    private readonly ISmartDeviceService _smartDeviceService;
+    private readonly HashSet<SmartDeviceViewModel> _trackedDevices = [];
     private readonly DispatcherTimer _calendarTimer;
     private readonly DispatcherTimer _timer;
     private readonly DispatcherTimer _weatherTimer;
+    private readonly DispatcherTimer _devicesTimer;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private bool _isUpdatingWeather;
     private bool _isUpdatingCalendar;
+    private bool _isUpdatingDevices;
     private bool _isDisposed;
 
     [ObservableProperty]
@@ -38,12 +45,13 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
     public IReadOnlyList<WeatherLocationViewModel> WeatherLocations { get; }
 
-    public IReadOnlyList<SmartPlugViewModel> SmartPlugs { get; }
-    public bool HasNoSmartPlugs => SmartPlugs.Count == 0;
-    public string PlugSummary => SmartPlugs.Count == 0 ? "No plugs connected" :
-        $"{SmartPlugs.Count(p => p.HasState && p.IsOn)} on · {SmartPlugs.Count(p => p.HasState && !p.IsOn)} off";
-    public string PlugAvailability => SmartPlugs.Count == 0 ? "Your plugs will appear here" :
-        $"{SmartPlugs.Count} configured · {SmartPlugs.Count(p => !p.HasState)} unknown";
+    public ObservableCollection<SmartDeviceViewModel> SmartDevices { get; } = [];
+    public bool HasNoSmartPlugs => SmartDevices.Count == 0;
+    public string PlugSummary => SmartDevices.Count == 0 ? "No plugs connected" :
+        $"{SmartDevices.Count(p => p.HasState && p.IsOn)} on · {SmartDevices.Count(p => p.HasState && !p.IsOn)} off";
+    public string PlugAvailability => _deviceLoadStatus ?? (SmartDevices.Count == 0 ? "Your plugs will appear here" :
+        $"{SmartDevices.Count} configured · {SmartDevices.Count(p => !p.HasState)} unknown");
+    private string? _deviceLoadStatus;
 
     public SpotifyViewModel Spotify { get; }
 
@@ -51,11 +59,12 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
     public bool HasNoCalendarEvents => CalendarEvents.Count == 0;
 
-    public ClockViewModel(IClockService clockService, IWeatherService weatherService, AppSettings settings, ICalendarService calendarService, IEnumerable<ISmartPlugService> smartPlugServices, SpotifyViewModel spotifyViewModel)
+    public ClockViewModel(IClockService clockService, IWeatherService weatherService, AppSettings settings, ICalendarService calendarService, ISmartDeviceService smartDeviceService, SpotifyViewModel spotifyViewModel)
     {
         _clockService = clockService;
         _weatherService = weatherService;
         _calendarService = calendarService;
+        _smartDeviceService = smartDeviceService;
 
         Spotify = spotifyViewModel;
 
@@ -63,9 +72,7 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
             .Select(location => new WeatherLocationViewModel(location))
             .ToArray();
 
-        SmartPlugs = smartPlugServices.Select(service => new SmartPlugViewModel(service)).ToArray();
-        foreach (var plug in SmartPlugs)
-            plug.PropertyChanged += OnPlugChanged;
+        SmartDevices.CollectionChanged += OnDevicesChanged;
 
         _timer = new DispatcherTimer
         {
@@ -91,10 +98,22 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
         _calendarTimer.Tick += async (_, _) => await UpdateCalendarAsync();
 
+        _devicesTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMinutes(1)
+        };
+        _devicesTimer.Tick += async (_, _) =>
+        {
+            if (RefreshDevicesCommand.CanExecute(null))
+                await RefreshDevicesCommand.ExecuteAsync(null);
+        };
+
         _ = UpdateCalendarAsync();
         _calendarTimer.Start();
         _ = UpdateWeatherAsync();
         _weatherTimer.Start();
+        _ = RefreshDevicesCommand.ExecuteAsync(null);
+        _devicesTimer.Start();
     }
 
     private void UpdateClock()
@@ -184,9 +203,64 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(HasNoCalendarEvents));
     }
 
+    [RelayCommand]
+    private async Task RefreshDevicesAsync()
+    {
+        if (_isDisposed || _isUpdatingDevices) return;
+        _isUpdatingDevices = true;
+        _deviceLoadStatus = "Loading devices…";
+        OnPropertyChanged(nameof(PlugAvailability));
+        try
+        {
+            var devices = await _smartDeviceService.GetDevicesAsync(_cancellationTokenSource.Token);
+            if (_isDisposed) return;
+
+            // Keep existing view models so their in-flight power commands remain valid.
+            foreach (var device in SmartDevices.Where(d => !devices.Any(m => m.Id == d.Id)).ToArray())
+                SmartDevices.Remove(device);
+            foreach (var model in devices)
+            {
+                var existing = SmartDevices.FirstOrDefault(d => d.Id == model.Id);
+                if (existing != null)
+                    existing.UpdateState(model);
+                else
+                    SmartDevices.Add(new SmartDeviceViewModel(model, _smartDeviceService));
+            }
+            _deviceLoadStatus = null;
+        }
+        catch (OperationCanceledException) when (_isDisposed) { }
+        catch (Exception exception)
+        {
+            Debug.WriteLine($"Unable to load smart devices: {exception.Message}");
+            if (!_isDisposed) _deviceLoadStatus = "Devices unavailable · Refresh to retry";
+        }
+        finally
+        {
+            _isUpdatingDevices = false;
+            if (!_isDisposed) OnPropertyChanged(nameof(PlugAvailability));
+        }
+    }
+
+    private void OnDevicesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Reconcile subscriptions for additions, removals and Collection.Clear().
+        foreach (var device in _trackedDevices.Where(d => !SmartDevices.Contains(d)).ToArray())
+        {
+            device.PropertyChanged -= OnPlugChanged;
+            device.Dispose();
+            _trackedDevices.Remove(device);
+        }
+        foreach (var device in SmartDevices)
+            if (_trackedDevices.Add(device)) device.PropertyChanged += OnPlugChanged;
+
+        OnPropertyChanged(nameof(HasNoSmartPlugs));
+        OnPropertyChanged(nameof(PlugSummary));
+        OnPropertyChanged(nameof(PlugAvailability));
+    }
+
     private void OnPlugChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(SmartPlugViewModel.HasState) or nameof(SmartPlugViewModel.IsOn))
+        if (e.PropertyName is nameof(SmartDeviceViewModel.HasState) or nameof(SmartDeviceViewModel.IsOn))
         {
             OnPropertyChanged(nameof(PlugSummary));
             OnPropertyChanged(nameof(PlugAvailability));
@@ -204,11 +278,14 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         _timer.Stop();
         _weatherTimer.Stop();
         _calendarTimer.Stop();
-        foreach (var plug in SmartPlugs)
+        _devicesTimer.Stop();
+        SmartDevices.CollectionChanged -= OnDevicesChanged;
+        foreach (var plug in _trackedDevices)
         {
             plug.PropertyChanged -= OnPlugChanged;
             plug.Dispose();
         }
+        _trackedDevices.Clear();
         _cancellationTokenSource.Cancel();
         _cancellationTokenSource.Dispose();
     }

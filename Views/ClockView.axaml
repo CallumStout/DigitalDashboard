@@ -236,30 +236,37 @@
                             <TextBlock Text="SMART PLUGS" FontSize="22" FontWeight="Bold"/>
                             <TextBlock Text="{Binding PlugAvailability}" Classes="muted"/>
                         </StackPanel>
-                        <TextBlock Grid.Column="1" Text="{Binding PlugSummary}" FontSize="18" Foreground="#8CDDED" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding PlugSummary}" FontSize="18" Foreground="#8CDDED" VerticalAlignment="Center"/>
+                            <Button Content="Refresh" Command="{Binding RefreshDevicesCommand}" Padding="16,0"
+                                    AutomationProperties.Name="Refresh device list"/>
+                        </StackPanel>
                     </Grid>
                 </Border>
                 <ScrollViewer x:Name="PlugsScroller" Grid.Row="1" Background="Transparent" IsScrollInertiaEnabled="True"
                               VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-                    <ItemsControl ItemsSource="{Binding SmartPlugs}">
+                    <ItemsControl ItemsSource="{Binding SmartDevices}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate><StackPanel Spacing="8"/></ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:SmartPlugViewModel">
-                                <Border Classes="card" MinHeight="96">
-                                    <Grid ColumnDefinitions="*,150,100">
-                                        <StackPanel Spacing="6" VerticalAlignment="Center" Margin="0,0,16,0">
-                                            <TextBlock Text="{Binding Name}" FontSize="19" FontWeight="SemiBold"
+                            <DataTemplate x:DataType="vm:SmartDeviceViewModel">
+                                <Border Classes="card" Padding="16" MinHeight="80">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
+                                            <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"
                                                        TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Text="{Binding Status}" Classes="muted"/>
+                                            <TextBlock Text="{Binding Type}" Classes="muted" FontSize="12" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Status}" Classes="muted" FontSize="12" TextWrapping="Wrap"/>
                                         </StackPanel>
-                                        <Button Grid.Column="1" Content="{Binding PowerButtonText}" Command="{Binding ToggleCommand}"
-                                                HorizontalAlignment="Stretch" VerticalAlignment="Center" MinHeight="56" Margin="0,0,8,0" Padding="8,0"
-                                                AutomationProperties.Name="{Binding Name, StringFormat='Change power for {0}'}"/>
-                                        <Button Grid.Column="2" Content="Refresh" Command="{Binding RefreshCommand}"
-                                                HorizontalAlignment="Stretch" VerticalAlignment="Center" MinHeight="56" Padding="8,0"
-                                                AutomationProperties.Name="{Binding Name, StringFormat='Refresh status for {0}'}"/>
+                                        <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+                                            <Button Content="{Binding PowerButtonText}" Command="{Binding ToggleCommand}"
+                                                    HorizontalAlignment="Stretch" MinWidth="144" Padding="16,0"
+                                                    AutomationProperties.Name="{Binding Name, StringFormat='Change power for {0}'}"/>
+                                            <Button Content="Retry" Command="{Binding RefreshCommand}" IsVisible="{Binding !HasState}"
+                                                    HorizontalAlignment="Stretch" Padding="16,0"
+                                                    AutomationProperties.Name="{Binding Name, StringFormat='Refresh status for {0}'}"/>
+                                        </StackPanel>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

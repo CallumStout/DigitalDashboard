@@ -42,7 +42,7 @@ namespace DigitalDashboard
                 });
                 services.AddSingleton<IWeatherService, WeatherService>();
                 services.AddSingleton<ICalendarService, GoogleCalendarService>();
-                services.AddHttpClient<ISmartPlugService, TapoSmartPlugService>(client =>
+                services.AddHttpClient<ISmartDeviceService, TapoSmartDeviceService>(client =>
                 {
                     client.BaseAddress = new Uri("http://127.0.0.1:8765/");
                     client.Timeout = TimeSpan.FromSeconds(10);

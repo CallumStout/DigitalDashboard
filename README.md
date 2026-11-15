@@ -42,7 +42,7 @@ connection failures show an offline state and retry automatically.
 
 ## Smart plug
 
-The Plugs page replaces Lighting and shows a vertically scrollable list with independent power and refresh controls (56 pixels high). The homepage summary shows confirmed on/off counts and unknown states, with a View plugs shortcut. Each registered ISmartPlugService gets its own card and polling lifecycle. The current registration connects one plug; additional physical plugs need separate service connections or a bridge/service extension for discovery and per-device addressing. No multi-device API is assumed.
+The Plugs page shows a vertically scrollable list of device cards with power controls and retry for unavailable devices. The homepage summary shows confirmed on/off counts and unknown states, with a View plugs shortcut. ISmartDeviceService loads configured devices from `/api/devices` at startup and every minute, adding or removing cards automatically. Each SmartDeviceViewModel refreshes its state every 30 seconds and skips list-driven state updates while its own request is running. The page's Refresh button reloads the device list manually. Device timers and requests are cleaned up when the dashboard closes.
 
 The existing plug connection uses a local HTTP bridge at `http://127.0.0.1:8765/`.
 This is a bridge API, not a direct connection to the Tapo device. The bridge must
@@ -52,12 +52,14 @@ The typed client is registered with `AddHttpClient`, supplied by the
 
 Expected endpoints:
 
-- `GET /api/plug`: JSON such as `{"name":"Desk lamp","isOn":false}`.
-  The boolean `isOn` is required; missing or malformed state is treated as unavailable.
-- `POST /api/plug/on` and `POST /api/plug/off`: return a successful HTTP status.
+- `GET /api/devices`: a JSON array such as `[{"id":"desk-lamp","name":"Desk lamp","type":"plug","isOn":false,"available":true}]`.
+  Each device needs a stable, unique `id`. Configure new plugs in the bridge; the dashboard discovers them on its next list refresh.
+- `GET /api/devices/{id}`: a single device object with the same fields.
+  Power controls require `available: true` and a boolean `isOn`; unknown state is unavailable.
+- `POST /api/devices/{id}/power?enabled=true` (or `false`): return a successful HTTP status.
   The dashboard then fetches the state again to display the confirmed result.
 
-State refreshes on startup and every 30 seconds. Each Refresh button refreshes its plug
+Individual states refresh every 30 seconds. Each Retry button refreshes its unavailable device
 manually. Power controls are disabled until a valid state has loaded and while
 requests are running. Failed requests show an unavailable status; a successful
 refresh restores control. Pending requests and polling stop when the app closes.

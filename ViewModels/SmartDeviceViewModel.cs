@@ -1,6 +1,8 @@
+﻿
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DigitalDashboard.Models;
 using DigitalDashboard.Services;
 using System;
 using System.Diagnostics;
@@ -11,15 +13,19 @@ using System.Threading.Tasks;
 
 namespace DigitalDashboard.ViewModels;
 
-public partial class SmartPlugViewModel : ViewModelBase, IDisposable
+public partial class SmartDeviceViewModel : ViewModelBase, IDisposable
 {
-    private readonly ISmartPlugService _smartPlugService;
+    private readonly ISmartDeviceService _smartDeviceService;
     private readonly CancellationTokenSource _lifetime = new();
     private readonly DispatcherTimer _refreshTimer;
     private bool _isDisposed;
 
+    public string Id { get; }
+
+    public string Type { get; }
+
     [ObservableProperty]
-    private string _name = "Smart Plug";
+    private string _name = "Smart Device";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(PowerButtonText))]
@@ -42,16 +48,47 @@ public partial class SmartPlugViewModel : ViewModelBase, IDisposable
     public string PowerButtonText => IsLoading ? "Please wait…" :
         !HasState ? "Power unavailable" : IsOn ? "Turn off" : "Turn on";
 
-    public SmartPlugViewModel(ISmartPlugService smartPlugService)
+    public SmartDeviceViewModel(
+        SmartDeviceModel model,
+        ISmartDeviceService smartDeviceService)
     {
-        _smartPlugService = smartPlugService;
-        _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
+        _smartDeviceService = smartDeviceService;
+
+        Id = model.Id;
+        Type = model.Type;
+
+        UpdateState(model);
+
+        _refreshTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(30)
+        };
+
         _refreshTimer.Tick += async (_, _) => await RefreshAsync();
         _refreshTimer.Start();
-        _ = RefreshAsync();
+    }
+
+    public void UpdateState(SmartDeviceModel model)
+    {
+        if (_isDisposed || IsLoading)
+        {
+            return;
+        }
+
+        Name = string.IsNullOrWhiteSpace(model.Name)
+            ? "Smart Device"
+            : model.Name;
+
+        IsOn = model.IsOn ?? false;
+        HasState = model.Available && model.IsOn.HasValue;
+
+        Status = !HasState
+            ? "Unavailable · Retry"
+            : IsOn ? "Power on" : "Power off";
     }
 
     private bool CanRefresh() => !IsLoading && !_isDisposed;
+
     private bool CanToggle() => CanRefresh() && HasState;
 
     [RelayCommand(CanExecute = nameof(CanRefresh))]
@@ -60,29 +97,54 @@ public partial class SmartPlugViewModel : ViewModelBase, IDisposable
     [RelayCommand(CanExecute = nameof(CanToggle))]
     private Task ToggleAsync() => CanToggle() ? RunAsync(!IsOn) : Task.CompletedTask;
 
-    // Serialize reads and writes so a stale refresh cannot overwrite a power change.
     private async Task RunAsync(bool? desiredPower)
     {
-        if (!CanRefresh()) return;
+        if (!CanRefresh())
+        {
+            return;
+        }
+
         IsLoading = true;
         Status = desiredPower.HasValue ? "Updating…" : "Refreshing…";
+
         try
         {
             if (desiredPower.HasValue)
-                await _smartPlugService.SetPowerAsync(desiredPower.Value, _lifetime.Token);
+            {
+                await _smartDeviceService.SetPowerAsync(
+                    Id,
+                    desiredPower.Value,
+                    _lifetime.Token);
+            }
 
-            var plug = await _smartPlugService.GetStateAsync(_lifetime.Token);
-            if (_isDisposed) return;
-            Name = string.IsNullOrWhiteSpace(plug.Name) ? "Smart Plug" : plug.Name;
-            IsOn = plug.IsOn;
-            HasState = true;
-            Status = IsOn ? "Power on" : "Power off";
+            var device = await _smartDeviceService.GetStateAsync(
+                Id,
+                _lifetime.Token);
+
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            Name = string.IsNullOrWhiteSpace(device.Name)
+                ? "Smart Device"
+                : device.Name;
+
+            IsOn = device.IsOn ?? false;
+            HasState = device.Available && device.IsOn.HasValue;
+
+            Status = !HasState
+                ? "Unavailable · Retry"
+                : IsOn ? "Power on" : "Power off";
         }
-        catch (OperationCanceledException) when (_isDisposed) { }
+        catch (OperationCanceledException) when (_isDisposed)
+        {
+        }
         catch (Exception exception) when (exception is HttpRequestException
             or OperationCanceledException or InvalidOperationException or JsonException)
         {
-            Debug.WriteLine($"Smart plug request failed: {exception.Message}");
+            Debug.WriteLine($"Smart device {Id} request failed: {exception.Message}");
+
             if (!_isDisposed)
             {
                 HasState = false;
@@ -91,17 +153,26 @@ public partial class SmartPlugViewModel : ViewModelBase, IDisposable
         }
         finally
         {
-            IsLoading = false;
+            if (!_isDisposed)
+            {
+                IsLoading = false;
+            }
         }
     }
 
     public void Dispose()
     {
-        if (_isDisposed) return;
+        if (_isDisposed)
+        {
+            return;
+        }
+
         _isDisposed = true;
+
         _refreshTimer.Stop();
         _lifetime.Cancel();
         _lifetime.Dispose();
+
         ToggleCommand.NotifyCanExecuteChanged();
         RefreshCommand.NotifyCanExecuteChanged();
     }
