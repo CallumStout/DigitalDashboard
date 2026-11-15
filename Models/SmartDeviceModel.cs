@@ -11,4 +11,6 @@ public class SmartDeviceModel
     public bool? IsOn { get; set; }
 
     public bool Available { get; set; }
+
+    public SmartDeviceCapabilities? Capabilities { get; set; }
 }

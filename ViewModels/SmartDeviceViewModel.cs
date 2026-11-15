@@ -25,6 +25,18 @@ public partial class SmartDeviceViewModel : ViewModelBase, IDisposable
     public string Type { get; }
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SupportsBrightness))]
+    [NotifyPropertyChangedFor(nameof(SupportsColour))]
+    [NotifyPropertyChangedFor(nameof(SupportsEnergyMonitoring))]
+    private SmartDeviceCapabilities? _capabilities;
+
+    public bool SupportsBrightness => Capabilities?.Brightness == true;
+
+    public bool SupportsColour => Capabilities?.Colour == true;
+
+    public bool SupportsEnergyMonitoring => Capabilities?.EnergyMonitoring == true;
+
+    [ObservableProperty]
     private string _name = "Smart Device";
 
     [ObservableProperty]
@@ -81,6 +93,7 @@ public partial class SmartDeviceViewModel : ViewModelBase, IDisposable
 
         IsOn = model.IsOn ?? false;
         HasState = model.Available && model.IsOn.HasValue;
+        Capabilities = model.Capabilities;
 
         Status = !HasState
             ? "Unavailable · Retry"
@@ -132,6 +145,7 @@ public partial class SmartDeviceViewModel : ViewModelBase, IDisposable
 
             IsOn = device.IsOn ?? false;
             HasState = device.Available && device.IsOn.HasValue;
+            Capabilities = device.Capabilities;
 
             Status = !HasState
                 ? "Unavailable · Retry"
