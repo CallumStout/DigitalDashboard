@@ -46,6 +46,12 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
     public IReadOnlyList<WeatherLocationViewModel> WeatherLocations { get; }
 
     public ObservableCollection<SmartDeviceViewModel> SmartDevices { get; } = [];
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasOverviewLight))]
+    private SmartDeviceViewModel? _overviewLight;
+
+    public bool HasOverviewLight => OverviewLight != null;
     public bool HasNoSmartPlugs => SmartDevices.Count == 0;
     public string PlugSummary => SmartDevices.Count == 0 ? "No plugs connected" :
         $"{SmartDevices.Count(p => p.HasState && p.IsOn)} on · {SmartDevices.Count(p => p.HasState && !p.IsOn)} off";
@@ -237,7 +243,11 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         finally
         {
             _isUpdatingDevices = false;
-            if (!_isDisposed) OnPropertyChanged(nameof(PlugAvailability));
+            if (!_isDisposed)
+            {
+                OnPropertyChanged(nameof(PlugAvailability));
+                UpdateOverviewLight();
+            }
         }
     }
 
@@ -256,10 +266,26 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         OnPropertyChanged(nameof(HasNoSmartPlugs));
         OnPropertyChanged(nameof(PlugSummary));
         OnPropertyChanged(nameof(PlugAvailability));
+        UpdateOverviewLight();
+    }
+
+    private void UpdateOverviewLight()
+    {
+        if (_isUpdatingDevices || _isDisposed) return;
+        // Keep the same light through renames and temporary outages.
+        if (OverviewLight != null && SmartDevices.Contains(OverviewLight)) return;
+
+        var lights = SmartDevices.Where(device => device.SupportsBrightness
+            || device.SupportsColour || device.SupportsColourTemperature);
+        OverviewLight = lights.FirstOrDefault(device =>
+            string.Equals(device.Name, "Bedside Lamp", StringComparison.OrdinalIgnoreCase))
+            ?? lights.FirstOrDefault();
     }
 
     private void OnPlugChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        if (e.PropertyName == nameof(SmartDeviceViewModel.Capabilities))
+            UpdateOverviewLight();
         if (e.PropertyName is nameof(SmartDeviceViewModel.HasState) or nameof(SmartDeviceViewModel.IsOn))
         {
             OnPropertyChanged(nameof(PlugSummary));

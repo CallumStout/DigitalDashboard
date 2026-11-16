@@ -166,7 +166,7 @@
                         </Grid>
                     </Border>
                 </Grid>
-                <Grid Grid.Column="2" RowDefinitions="132,100,*" Margin="4,0,0,0">
+                <Grid Grid.Column="2" RowDefinitions="132,132,*" Margin="4,0,0,0">
                     <Border Classes="card">
                         <StackPanel Spacing="8">
                             <TextBlock Text="THERMOSTAT" Classes="label"/>
@@ -180,10 +180,36 @@
                     </Border>
                     <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,8,0,0">
                         <Border Classes="card" Margin="0,0,4,0" Padding="10">
-                            <StackPanel Spacing="8">
-                                <TextBlock Text="LIGHTS" Classes="label" Foreground="#F5BC58"/>
-                                <TextBlock Text="Not&#10;connected" Classes="muted"/>
-                            </StackPanel>
+                            <Grid>
+                                <Grid RowDefinitions="48,48" RowSpacing="4" IsVisible="{Binding HasOverviewLight}">
+                                    <Button Click="Navigate" Tag="Plugs" Background="Transparent" Padding="0"
+                                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                                            AutomationProperties.Name="{Binding OverviewLight.Name, StringFormat='Open device controls for {0}'}"
+                                            ToolTip.Tip="{Binding OverviewLight.Name}">
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Text="LIGHTS" Classes="label" Foreground="#F5BC58"/>
+                                            <TextBlock Text="{Binding OverviewLight.Name}" FontSize="12" FontWeight="SemiBold"
+                                                       TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Grid.Row="1" Command="{Binding OverviewLight.ToggleCommand}"
+                                            HorizontalAlignment="Stretch" Padding="4,0"
+                                            AutomationProperties.Name="{Binding OverviewLight.Name, StringFormat='Toggle power for {0}'}"
+                                            ToolTip.Tip="{Binding OverviewLight.PowerButtonText}">
+                                        <StackPanel Spacing="0">
+                                            <TextBlock Text="⏻" FontSize="18" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding OverviewLight.Status}" FontSize="11"
+                                                       HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                                <StackPanel Spacing="4" IsVisible="{Binding !HasOverviewLight}">
+                                    <TextBlock Text="LIGHTS" Classes="label" Foreground="#F5BC58"/>
+                                    <TextBlock Text="No lights available" Classes="muted" FontSize="12" TextWrapping="Wrap"/>
+                                    <Button Content="View" Click="Navigate" Tag="Plugs" HorizontalAlignment="Stretch"
+                                            AutomationProperties.Name="Open device controls"/>
+                                </StackPanel>
+                            </Grid>
                         </Border>
                         <Border Grid.Column="1" Classes="card" Margin="4,0,0,0" Padding="10">
                             <StackPanel Spacing="8">
