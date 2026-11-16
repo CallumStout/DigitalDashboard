@@ -47,8 +47,10 @@ public partial class ClockView : UserControl
 
         viewer.PointerPressed += (_, e) =>
         {
-            // Keep power and refresh buttons clickable inside the plugs list.
-            if (e.Source is Visual source && source.FindAncestorOfType<Button>(includeSelf: true) != null)
+            // Let device controls handle their own gestures instead of dragging the list.
+            if (e.Source is Visual source
+                && (source.FindAncestorOfType<Button>(includeSelf: true) != null
+                    || source.FindAncestorOfType<Slider>(includeSelf: true) != null))
                 return;
 
             if (e.Pointer.Type != PointerType.Mouse

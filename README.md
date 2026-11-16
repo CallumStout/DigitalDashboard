@@ -58,6 +58,13 @@ Expected endpoints:
   Power controls require `available: true` and a boolean `isOn`; unknown state is unavailable.
 - `POST /api/devices/{id}/power?enabled=true` (or `false`): return a successful HTTP status.
   The dashboard then fetches the state again to display the confirmed result.
+- `POST /api/devices/{id}/brightness?brightness=1` through `100`: set brightness (the bridge also turns the bulb on).
+- `POST /api/devices/{id}/preset?preset=relax` or `bright`: apply 30% at 2700 K or 100% at 5000 K respectively (also turns the bulb on).
+
+Device responses can include `capabilities`, for example `{"power":true,"brightness":true,"colour":true,"colourTemperature":true,"energyMonitoring":false}`.
+The rectangular device tiles show a 1–100% brightness slider only when `brightness` is supported, and Relax/Bright buttons only when both `brightness` and `colourTemperature` are supported. Plugs keep their existing power and retry controls.
+Slider changes are sent after a 500 ms pause, coalescing intermediate values; power and preset commands cancel any pending slider change. Controls are disabled during requests and unavailable states.
+The current bridge does not return the current brightness, so the slider is labelled **Set brightness** and starts with a target of 50% without sending it. Successful presets update that target to 30% or 100%; external brightness changes cannot currently be reflected in the slider.
 
 Individual states refresh every 30 seconds. Each Retry button refreshes its unavailable device
 manually. Power controls are disabled until a valid state has loaded and while

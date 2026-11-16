@@ -46,4 +46,24 @@ public class TapoSmartDeviceService : ISmartDeviceService
 
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task SetBrightnessAsync(string deviceId, int brightness, CancellationToken cancellationToken = default)
+    {
+        if (brightness is < 1 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(brightness));
+
+        var endpoint = $"api/devices/{Uri.EscapeDataString(deviceId)}/brightness?brightness={brightness}";
+        using var response = await _httpClient.PostAsync(endpoint, null, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task SetPresetAsync(string deviceId, string preset, CancellationToken cancellationToken = default)
+    {
+        if (preset is not ("relax" or "bright"))
+            throw new ArgumentException("Unknown lighting preset.", nameof(preset));
+
+        var endpoint = $"api/devices/{Uri.EscapeDataString(deviceId)}/preset?preset={preset}";
+        using var response = await _httpClient.PostAsync(endpoint, null, cancellationToken);
+        response.EnsureSuccessStatusCode();
+    }
 }

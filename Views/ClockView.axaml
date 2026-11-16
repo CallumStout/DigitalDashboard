@@ -233,7 +233,7 @@
                 <Border Classes="card" Margin="0,0,0,8">
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="SMART PLUGS" FontSize="22" FontWeight="Bold"/>
+                            <TextBlock Text="SMART DEVICES" FontSize="22" FontWeight="Bold"/>
                             <TextBlock Text="{Binding PlugAvailability}" Classes="muted"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
@@ -247,33 +247,57 @@
                               VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
                     <ItemsControl ItemsSource="{Binding SmartDevices}">
                         <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate><StackPanel Spacing="8"/></ItemsPanelTemplate>
+                            <ItemsPanelTemplate><WrapPanel Orientation="Horizontal"/></ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:SmartDeviceViewModel">
-                                <Border Classes="card" Padding="16" MinHeight="80">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Spacing="4" VerticalAlignment="Center" Margin="0,0,16,0">
+                                <Border Classes="card" Padding="16" Width="320" MinHeight="184" Margin="0,0,8,8" VerticalAlignment="Top">
+                                    <Grid RowDefinitions="*,Auto,Auto,Auto">
+                                        <StackPanel Spacing="4">
                                             <TextBlock Text="{Binding Name}" FontSize="16" FontWeight="SemiBold"
                                                        TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Text="{Binding Type}" Classes="muted" FontSize="12" TextWrapping="Wrap"/>
-                                            <TextBlock Text="{Binding Status}" Classes="muted" FontSize="12" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding Type}" Classes="muted" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Status}" Classes="muted" FontSize="12" TextTrimming="CharacterEllipsis"/>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+                                        <StackPanel Grid.Row="1" IsVisible="{Binding SupportsBrightness}" Margin="0,12,0,0" Spacing="4">
+                                            <TextBlock Text="{Binding Brightness, StringFormat='Set brightness · {0}%'}" Classes="muted"/>
+                                            <Slider Minimum="1" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                                                    Value="{Binding Brightness, Mode=TwoWay}" IsEnabled="{Binding CanAdjustBrightness}"
+                                                    MinHeight="48" AutomationProperties.Name="{Binding Name, StringFormat='Set brightness for {0}'}"/>
+                                        </StackPanel>
+                                        <Grid Grid.Row="2" ColumnDefinitions="*,*" IsVisible="{Binding SupportsPresets}" Margin="0,8,0,0">
+                                            <Button Command="{Binding ApplyPresetCommand}" CommandParameter="relax"
+                                                    HorizontalAlignment="Stretch" Margin="0,0,4,0" Padding="8" MinHeight="56"
+                                                    AutomationProperties.Name="{Binding Name, StringFormat='Relax preset for {0}: 30 percent, warm white'}">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="Relax" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="30% · Warm" Classes="muted" FontSize="12" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Grid.Column="1" Command="{Binding ApplyPresetCommand}" CommandParameter="bright"
+                                                    HorizontalAlignment="Stretch" Margin="4,0,0,0" Padding="8" MinHeight="56"
+                                                    AutomationProperties.Name="{Binding Name, StringFormat='Bright preset for {0}: 100 percent, cool white'}">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="Bright" HorizontalAlignment="Center"/>
+                                                    <TextBlock Text="100% · Cool" Classes="muted" FontSize="12" HorizontalAlignment="Center"/>
+                                                </StackPanel>
+                                            </Button>
+                                        </Grid>
+                                        <Grid Grid.Row="3" ColumnDefinitions="*,Auto" Margin="0,12,0,0">
                                             <Button Content="{Binding PowerButtonText}" Command="{Binding ToggleCommand}"
                                                     HorizontalAlignment="Stretch" MinWidth="144" Padding="16,0"
                                                     AutomationProperties.Name="{Binding Name, StringFormat='Change power for {0}'}"/>
-                                            <Button Content="Retry" Command="{Binding RefreshCommand}" IsVisible="{Binding !HasState}"
-                                                    HorizontalAlignment="Stretch" Padding="16,0"
+                                            <Button Grid.Column="1" Content="Retry" Command="{Binding RefreshCommand}" IsVisible="{Binding !HasState}"
+                                                    HorizontalAlignment="Stretch" Padding="16,0" Margin="8,0,0,0"
                                                     AutomationProperties.Name="{Binding Name, StringFormat='Refresh status for {0}'}"/>
-                                        </StackPanel>
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-                <TextBlock Grid.Row="1" IsVisible="{Binding HasNoSmartPlugs}" Text="No plugs connected yet" Classes="muted"
+                <TextBlock Grid.Row="1" IsVisible="{Binding HasNoSmartPlugs}" Text="No devices connected yet" Classes="muted"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
             <Border x:Name="FeaturePanel" Grid.Column="1" Classes="card" Margin="8,0,8,8" IsVisible="False">
