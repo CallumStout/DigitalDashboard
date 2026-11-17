@@ -149,8 +149,8 @@
                 </Grid>
                 <Grid Grid.Column="1" RowDefinitions="*,184" Margin="4,0">
                     <Border Classes="card" Padding="10">
-                        <!-- Size to the content when it fits, keeping the arrows beside the forecast. -->
-                        <Grid RowDefinitions="*,Auto" VerticalAlignment="Top">
+                        <!-- Centre navigation in the space remaining below the forecast. -->
+                        <Grid x:Name="WeatherLayout" RowDefinitions="Auto,*" SizeChanged="WeatherLayoutSizeChanged">
                             <TextBlock Text="No weather location configured" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasNoWeatherLocations}"/>
                             <ScrollViewer x:Name="WeatherScroller" Background="Transparent" IsScrollInertiaEnabled="True"
                                           VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
@@ -205,7 +205,7 @@
                                     </ContentControl.ContentTemplate>
                                 </ContentControl>
                             </ScrollViewer>
-                            <Grid Grid.Row="1" ColumnDefinitions="48,*,48" Margin="0,2,0,0" IsVisible="{Binding HasMultipleWeatherLocations}">
+                            <Grid x:Name="WeatherNavigation" Grid.Row="1" ColumnDefinitions="48,*,48" Margin="0,6" VerticalAlignment="Center" IsVisible="{Binding HasMultipleWeatherLocations}">
                                 <Button Content="‹" FontSize="24" Command="{Binding PreviousWeatherLocationCommand}" AutomationProperties.Name="Previous weather location"/>
                                 <TextBlock Grid.Column="1" Text="{Binding WeatherLocationPosition}" FontSize="14" Foreground="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <Button Grid.Column="2" Content="›" FontSize="24" Command="{Binding NextWeatherLocationCommand}" AutomationProperties.Name="Next weather location"/>

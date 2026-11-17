@@ -17,6 +17,13 @@ public partial class ClockView : UserControl
         EnableMouseDragScrolling(LightsScroller);
     }
 
+    private void WeatherLayoutSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        // Allow content-sized weather rows, but keep navigation reachable on short screens.
+        var navigationHeight = WeatherNavigation.IsVisible ? 60 : 0;
+        WeatherScroller.MaxHeight = System.Math.Max(0, e.NewSize.Height - navigationHeight);
+    }
+
     private void Navigate(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button { Tag: string section }) return;
