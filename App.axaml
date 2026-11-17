@@ -4,11 +4,46 @@
              xmlns:local="using:DigitalDashboard"
              RequestedThemeVariant="Dark">
 
+    <Application.Resources>
+        <!-- Shared Nocturne palette: cyan, amber and mint on neutral charcoal. -->
+        <SolidColorBrush x:Key="CanvasBrush" Color="#0B0F17"/>
+        <SolidColorBrush x:Key="SidebarBrush" Color="#14181F"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#1D2129"/>
+        <SolidColorBrush x:Key="ControlBrush" Color="#252A33"/>
+        <SolidColorBrush x:Key="ControlHoverBrush" Color="#303640"/>
+        <SolidColorBrush x:Key="ControlPressedBrush" Color="#3A424E"/>
+        <SolidColorBrush x:Key="TextBrush" Color="#E0E3EF"/>
+        <SolidColorBrush x:Key="MutedTextBrush" Color="#B8C7CC"/>
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#00D2FF"/>
+        <SolidColorBrush x:Key="PrimarySoftBrush" Color="#A4E7FA"/>
+        <SolidColorBrush x:Key="PrimaryPressedBrush" Color="#00A8CC"/>
+        <SolidColorBrush x:Key="SecondaryBrush" Color="#FFB020"/>
+        <SolidColorBrush x:Key="TertiaryBrush" Color="#00E599"/>
+        <SolidColorBrush x:Key="TertiaryPressedBrush" Color="#00B87A"/>
+        <SolidColorBrush x:Key="TertiaryDimBrush" Color="#006B4A"/>
+        <Color x:Key="ArtworkShadeTop">#B00B0F17</Color>
+        <Color x:Key="ArtworkShadeMiddle">#200B0F17</Color>
+        <Color x:Key="ArtworkShadeLower">#A00B0F17</Color>
+        <Color x:Key="ArtworkShadeBottom">#F00B0F17</Color>
+    </Application.Resources>
+
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
   
     <Application.Styles>
-        <FluentTheme />
+        <FluentTheme>
+            <FluentTheme.Palettes>
+                <ColorPaletteResources x:Key="Dark" Accent="#00D2FF"/>
+            </FluentTheme.Palettes>
+        </FluentTheme>
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{DynamicResource CanvasBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        </Style>
+        <Style Selector="ToolTip">
+            <Setter Property="Background" Value="{DynamicResource ControlBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        </Style>
     </Application.Styles>
 </Application>

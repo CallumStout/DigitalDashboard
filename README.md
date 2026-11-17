@@ -10,13 +10,14 @@ minimum 48×48 logical-pixel touch target, with spacing between adjacent control
 Use native display resolution and check OS display scaling on the target device.
 
 The clock, configured weather locations, and Google Calendar retain their live
-connections. Weather and agenda lists scroll independently with touch inertia;
+connections. The weather card shows one location at a time with previous/next buttons, wrapping through configured locations. It uses Celsius and mph, with current conditions, today's high, humidity, UV index and four forecasts across the next 12 hours (in the location's local time). Data refreshes every ten minutes. AQI is not included. Weather details and agenda lists scroll independently with touch inertia;
 mouse dragging also works for touch drivers that report mouse input. Calendar
 entries include their start time or an all-day label.
 
-Thermostat, lights, and door are clearly marked
-as not connected. Thermostat buttons are disabled until
-integrations are added. Climate and Security navigation opens a
+The overview Lights card shows configured bulbs with individual power controls.
+One bulb fills the card width; multiple bulbs appear in two columns and scroll
+when needed. The former Door card has been removed.
+Thermostat buttons are disabled until an integration is added. Climate and Security navigation opens a
 placeholder page with a working return button. No device status is simulated.
 
 ## Spotify card

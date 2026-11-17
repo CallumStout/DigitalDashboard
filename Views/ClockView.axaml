@@ -6,20 +6,20 @@
              x:DataType="vm:ClockViewModel">
     <UserControl.Styles>
         <Style Selector="TextBlock">
-            <Setter Property="Foreground" Value="#EAF0F7"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
             <Setter Property="FontSize" Value="14"/>
         </Style>
         <Style Selector="TextBlock.label">
-            <Setter Property="Foreground" Value="#9BAAB9"/>
+            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
         </Style>
         <Style Selector="TextBlock.muted">
-            <Setter Property="Foreground" Value="#9BAAB9"/>
+            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
             <Setter Property="FontSize" Value="13"/>
         </Style>
         <Style Selector="Border.card">
-            <Setter Property="Background" Value="#191F28"/>
+            <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="Padding" Value="12"/>
         </Style>
@@ -29,15 +29,23 @@
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Background" Value="#253140"/>
-            <Setter Property="Foreground" Value="#EAF0F7"/>
+            <Setter Property="Background" Value="{DynamicResource ControlBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        </Style>
+        <Style Selector="Button:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ControlHoverBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+        </Style>
+        <Style Selector="Button:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource ControlPressedBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         </Style>
         <Style Selector="Button:disabled">
             <Setter Property="Opacity" Value="0.8"/>
         </Style>
         <Style Selector="Button:disabled /template/ ContentPresenter">
-            <Setter Property="Background" Value="#253140"/>
-            <Setter Property="Foreground" Value="#9BAAB9"/>
+            <Setter Property="Background" Value="{DynamicResource ControlBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
         </Style>
         <Style Selector="Button.nav">
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -47,44 +55,52 @@
             <Setter Property="FontSize" Value="14"/>
         </Style>
         <Style Selector="Button.nav.active">
-            <Setter Property="Background" Value="#00C7E8"/>
-            <Setter Property="Foreground" Value="#07222D"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource CanvasBrush}"/>
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
         <Style Selector="Button.nav.active /template/ ContentPresenter">
-            <Setter Property="Background" Value="#00C7E8"/>
-            <Setter Property="Foreground" Value="#07222D"/>
+            <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource CanvasBrush}"/>
+        </Style>
+        <Style Selector="Button.nav.active:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource PrimarySoftBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource CanvasBrush}"/>
+        </Style>
+        <Style Selector="Button.nav.active:pressed /template/ ContentPresenter">
+            <Setter Property="Background" Value="{DynamicResource PrimaryPressedBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource CanvasBrush}"/>
         </Style>
         <!-- Touch drivers may leave the pointer hovering after release. Keep
              transport colours stable in that state; only a held press darkens. -->
         <Style Selector="Button.transport:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#253140"/>
-            <Setter Property="Foreground" Value="#EAF0F7"/>
+            <Setter Property="Background" Value="{DynamicResource ControlBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         </Style>
         <Style Selector="Button.transport:pressed /template/ ContentPresenter">
-            <Setter Property="Background" Value="#34465B"/>
-            <Setter Property="Foreground" Value="#EAF0F7"/>
+            <Setter Property="Background" Value="{DynamicResource ControlPressedBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
         </Style>
         <Style Selector="Button.transport.play:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#1ED760"/>
-            <Setter Property="Foreground" Value="#092416"/>
+            <Setter Property="Background" Value="{DynamicResource TertiaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource CanvasBrush}"/>
         </Style>
         <Style Selector="Button.transport.play:pressed /template/ ContentPresenter">
-            <Setter Property="Background" Value="#17AD4D"/>
-            <Setter Property="Foreground" Value="#092416"/>
+            <Setter Property="Background" Value="{DynamicResource TertiaryPressedBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource CanvasBrush}"/>
         </Style>
         <Style Selector="Button.transport.play:disabled /template/ ContentPresenter">
-            <Setter Property="Background" Value="#1ED760"/>
-            <Setter Property="Foreground" Value="#092416"/>
+            <Setter Property="Background" Value="{DynamicResource TertiaryBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource CanvasBrush}"/>
         </Style>
     </UserControl.Styles>
-    <Grid Background="#0E131B" RowDefinitions="36,*">
+    <Grid Background="{DynamicResource CanvasBrush}" RowDefinitions="36,*">
         <Grid ColumnDefinitions="*,Auto" Margin="14,0">
-            <TextBlock Text="DIGITAL HOME" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="#8CDDED"/>
+            <TextBlock Text="DIGITAL HOME" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" Foreground="{DynamicResource PrimarySoftBrush}"/>
             <TextBlock Grid.Column="1" Text="HOME OVERVIEW" Classes="label" VerticalAlignment="Center"/>
         </Grid>
         <Grid Grid.Row="1" ColumnDefinitions="104,*">
-            <Border Background="#151C25" Padding="6,8">
+            <Border Background="{DynamicResource SidebarBrush}" Padding="6,8">
                 <Grid RowDefinitions="*,Auto">
                     <StackPanel Spacing="8">
                         <Button x:Name="OverviewButton" Classes="nav active" Content="Overview" Click="Navigate" Tag="Overview"/>
@@ -100,7 +116,7 @@
                 <Grid RowDefinitions="126,*" Margin="0,0,4,0">
                     <Border Classes="card">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="WELCOME HOME" Classes="label" Foreground="#55DDB4"/>
+                            <TextBlock Text="WELCOME HOME" Classes="label" Foreground="{DynamicResource TertiaryBrush}"/>
                             <Viewbox Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Left">
                                 <TextBlock Text="{Binding Time}" FontSize="44" FontWeight="Bold"/>
                             </Viewbox>
@@ -116,10 +132,10 @@
                                     <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="8"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate x:DataType="models:CalendarEventModel">
-                                            <Border Background="#212B37" CornerRadius="7" Padding="10" MinHeight="70" BorderBrush="#00C7E8" BorderThickness="3,0,0,0">
+                                            <Border Background="{DynamicResource ControlBrush}" CornerRadius="7" Padding="10" MinHeight="70" BorderBrush="{DynamicResource PrimaryBrush}" BorderThickness="3,0,0,0">
                                                 <StackPanel Spacing="5">
                                                     <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding DisplayTime}" FontSize="12" Foreground="#8CDDED"/>
+                                                    <TextBlock Text="{Binding DisplayTime}" FontSize="12" Foreground="{DynamicResource PrimarySoftBrush}"/>
                                                 </StackPanel>
                                             </Border>
                                         </DataTemplate>
@@ -131,35 +147,72 @@
                     </Border>
                 </Grid>
                 <Grid Grid.Column="1" RowDefinitions="*,158" Margin="4,0">
-                    <Border Classes="card">
-                        <Grid RowDefinitions="Auto,*">
-                            <TextBlock Text="WEATHER" Classes="label" Margin="0,0,0,8"/>
-                            <ScrollViewer x:Name="WeatherScroller" Grid.Row="1" Background="Transparent" IsScrollInertiaEnabled="True"
+                    <Border Classes="card" Padding="10">
+                        <Grid RowDefinitions="*,Auto">
+                            <TextBlock Text="No weather location configured" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasNoWeatherLocations}"/>
+                            <ScrollViewer x:Name="WeatherScroller" Background="Transparent" IsScrollInertiaEnabled="True"
                                           VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
-                                <StackPanel Spacing="8">
-                                    <TextBlock Text="No weather location configured" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasNoWeatherLocations}"/>
-                                    <ItemsControl ItemsSource="{Binding WeatherLocations}">
-                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Spacing="12"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate x:DataType="vm:WeatherLocationViewModel">
-                                                <StackPanel Spacing="3">
-                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                                                    <StackPanel Orientation="Horizontal" Spacing="4">
-                                                        <TextBlock Text="{Binding Temperature}" FontSize="38" FontWeight="Bold"/>
-                                                        <TextBlock Text="°C" Foreground="#F5BC58" FontSize="20" Margin="0,6,0,0"/>
+                                <ContentControl Content="{Binding SelectedWeatherLocation}">
+                                    <ContentControl.ContentTemplate>
+                                        <DataTemplate x:DataType="vm:WeatherLocationViewModel">
+                                            <StackPanel Spacing="5">
+                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="Bold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}"/>
+                                                <Grid ColumnDefinitions="*,56" Height="50">
+                                                    <StackPanel Orientation="Horizontal" Spacing="2">
+                                                        <TextBlock Text="{Binding Temperature}" FontSize="44" FontWeight="Bold"/>
+                                                        <TextBlock Text="°C" Foreground="{DynamicResource SecondaryBrush}" FontSize="18" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
                                                     </StackPanel>
-                                                    <TextBlock Text="{Binding Description}" Classes="muted" TextWrapping="Wrap"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
+                                                    <TextBlock Grid.Column="1" Text="{Binding Icon}" Foreground="{DynamicResource SecondaryBrush}" FontSize="42" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <TextBlock Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap"/>
+                                                <Border Background="{DynamicResource CanvasBrush}" CornerRadius="7" Padding="4,6">
+                                                    <Grid ColumnDefinitions="*,*,1.4*">
+                                                        <StackPanel><TextBlock Text="HUMIDITY" FontSize="8" Classes="label" HorizontalAlignment="Center"/><TextBlock Text="{Binding Humidity}" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center"/></StackPanel>
+                                                        <StackPanel Grid.Column="1"><TextBlock Text="UV INDEX" FontSize="8" Classes="label" HorizontalAlignment="Center"/><TextBlock Text="{Binding Uv}" FontSize="12" Foreground="{DynamicResource SecondaryBrush}" FontWeight="Bold" HorizontalAlignment="Center"/></StackPanel>
+                                                        <StackPanel Grid.Column="2"><TextBlock Text="WIND" FontSize="8" Classes="label" HorizontalAlignment="Center"/><TextBlock Text="{Binding Wind}" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/></StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                                <TextBlock Text="NEXT 12 HOURS" FontSize="9" Classes="label" Margin="0,2,0,0"/>
+                                                <ItemsControl ItemsSource="{Binding Forecast}">
+                                                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="4"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:WeatherForecast">
+                                                            <Border Background="{DynamicResource ControlBrush}" CornerRadius="6" Margin="1,0" Padding="1,3" ToolTip.Tip="{Binding Description}">
+                                                                <!-- Fixed slots keep glyph metrics from shifting the forecast rows. -->
+                                                                <Grid RowDefinitions="12,26,18">
+                                                                    <TextBlock Grid.Row="0" Text="{Binding Time}" FontSize="9"
+                                                                               TextAlignment="Center" VerticalAlignment="Center"
+                                                                               Foreground="{DynamicResource MutedTextBrush}"/>
+                                                                    <Border Grid.Row="1" Width="26" Height="26"
+                                                                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                        <Viewbox Width="22" Height="22" Stretch="Uniform"
+                                                                                 HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                            <TextBlock Text="{Binding Icon}" FontSize="20" TextAlignment="Center"
+                                                                                       Foreground="{DynamicResource SecondaryBrush}"/>
+                                                                        </Viewbox>
+                                                                    </Border>
+                                                                    <TextBlock Grid.Row="2" Text="{Binding Temperature}" FontSize="12" FontWeight="Bold"
+                                                                               TextAlignment="Center" VerticalAlignment="Center"/>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ContentControl.ContentTemplate>
+                                </ContentControl>
                             </ScrollViewer>
+                            <Grid Grid.Row="1" ColumnDefinitions="48,*,48" Margin="0,4,0,0" IsVisible="{Binding HasMultipleWeatherLocations}">
+                                <Button Content="‹" FontSize="24" Command="{Binding PreviousWeatherLocationCommand}" AutomationProperties.Name="Previous weather location"/>
+                                <TextBlock Grid.Column="1" Text="{Binding WeatherLocationPosition}" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Button Grid.Column="2" Content="›" FontSize="24" Command="{Binding NextWeatherLocationCommand}" AutomationProperties.Name="Next weather location"/>
+                            </Grid>
                         </Grid>
                     </Border>
                     <Border Grid.Row="1" Classes="card" Margin="0,8,0,0">
                         <Grid RowDefinitions="Auto,Auto,*,48">
-                            <TextBlock Text="PLUG OVERVIEW" Classes="label" Foreground="#8CDDED"/>
+                            <TextBlock Text="PLUG OVERVIEW" Classes="label" Foreground="{DynamicResource PrimarySoftBrush}"/>
                             <TextBlock Grid.Row="1" Text="{Binding PlugSummary}" FontSize="20" FontWeight="SemiBold" Margin="0,4,0,0"/>
                             <TextBlock Grid.Row="2" Text="{Binding PlugAvailability}" Classes="muted" VerticalAlignment="Center"/>
                             <Button Grid.Row="3" Content="View plugs" Click="Navigate" Tag="Plugs" HorizontalAlignment="Stretch"/>
@@ -178,76 +231,74 @@
                             <TextBlock Text="Not connected" Classes="muted"/>
                         </StackPanel>
                     </Border>
-                    <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,8,0,0">
-                        <Border Classes="card" Margin="0,0,4,0" Padding="10">
-                            <Grid>
-                                <Grid RowDefinitions="48,48" RowSpacing="4" IsVisible="{Binding HasOverviewLight}">
-                                    <Button Click="Navigate" Tag="Plugs" Background="Transparent" Padding="0"
-                                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                            AutomationProperties.Name="{Binding OverviewLight.Name, StringFormat='Open device controls for {0}'}"
-                                            ToolTip.Tip="{Binding OverviewLight.Name}">
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Text="LIGHTS" Classes="label" Foreground="#F5BC58"/>
-                                            <TextBlock Text="{Binding OverviewLight.Name}" FontSize="12" FontWeight="SemiBold"
-                                                       TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
-                                        </StackPanel>
-                                    </Button>
-                                    <Button Grid.Row="1" Command="{Binding OverviewLight.ToggleCommand}"
-                                            HorizontalAlignment="Stretch" Padding="4,0"
-                                            AutomationProperties.Name="{Binding OverviewLight.Name, StringFormat='Toggle power for {0}'}"
-                                            ToolTip.Tip="{Binding OverviewLight.PowerButtonText}">
-                                        <StackPanel Spacing="0">
-                                            <TextBlock Text="⏻" FontSize="18" HorizontalAlignment="Center"/>
-                                            <TextBlock Text="{Binding OverviewLight.Status}" FontSize="11"
-                                                       HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                        </StackPanel>
-                                    </Button>
-                                </Grid>
-                                <StackPanel Spacing="4" IsVisible="{Binding !HasOverviewLight}">
-                                    <TextBlock Text="LIGHTS" Classes="label" Foreground="#F5BC58"/>
-                                    <TextBlock Text="No lights available" Classes="muted" FontSize="12" TextWrapping="Wrap"/>
-                                    <Button Content="View" Click="Navigate" Tag="Plugs" HorizontalAlignment="Stretch"
-                                            AutomationProperties.Name="Open device controls"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-                        <Border Grid.Column="1" Classes="card" Margin="4,0,0,0" Padding="10">
-                            <StackPanel Spacing="8">
-                                <TextBlock Text="DOOR" Classes="label" Foreground="#8CDDED"/>
-                                <TextBlock Text="Not&#10;connected" Classes="muted"/>
+                    <Border Grid.Row="1" Classes="card" Margin="0,8,0,0" Padding="10">
+                        <Grid RowDefinitions="Auto,*" RowSpacing="4">
+                            <TextBlock Text="LIGHTS" Classes="label" Foreground="{DynamicResource SecondaryBrush}"/>
+                            <ScrollViewer x:Name="LightsScroller" Grid.Row="1" Background="Transparent" IsScrollInertiaEnabled="True"
+                                          VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                          IsVisible="{Binding HasOverviewLights}">
+                                <ItemsControl ItemsSource="{Binding OverviewLights}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate><UniformGrid Columns="{Binding OverviewLightColumns}"/></ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:SmartDeviceViewModel">
+                                            <Grid RowDefinitions="28,48" RowSpacing="4" Margin="2,0,2,4">
+                                                <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="SemiBold"
+                                                           TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"
+                                                           ToolTip.Tip="{Binding Name}"/>
+                                                <Button Grid.Row="1" Command="{Binding ToggleCommand}"
+                                                        HorizontalAlignment="Stretch" Padding="4,0"
+                                                        AutomationProperties.Name="{Binding Name, StringFormat='Toggle power for {0}'}"
+                                                        ToolTip.Tip="{Binding PowerButtonText}">
+                                                    <StackPanel Spacing="0">
+                                                        <TextBlock Text="&#x23FB;" FontSize="18" HorizontalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding Status}" FontSize="11"
+                                                                   HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                            <StackPanel Grid.Row="1" Spacing="4" IsVisible="{Binding !HasOverviewLights}">
+                                <TextBlock Text="No lights available" Classes="muted" FontSize="12" TextWrapping="Wrap"/>
+                                <Button Content="View devices" Click="Navigate" Tag="Plugs" HorizontalAlignment="Stretch"
+                                        AutomationProperties.Name="Open device controls"/>
                             </StackPanel>
-                        </Border>
-                    </Grid>
-                    <Border Grid.Row="2" Classes="card" Margin="0,8,0,0" Background="#192621" Padding="0" ClipToBounds="True">
+                        </Grid>
+                    </Border>
+                    <Border Grid.Row="2" Classes="card" Margin="0,8,0,0" Background="{DynamicResource CardBrush}" Padding="0" ClipToBounds="True">
                         <Grid>
                             <Image Source="{Binding Spotify.AlbumArtwork}" Stretch="UniformToFill"
                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                             <TextBlock Text="♫" IsVisible="{Binding !Spotify.HasArtwork}" FontSize="64"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#38634B"/>
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TertiaryDimBrush}"/>
                             <Border IsHitTestVisible="False">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
-                                        <GradientStop Offset="0" Color="#B0000000"/>
-                                        <GradientStop Offset="0.35" Color="#20000000"/>
-                                        <GradientStop Offset="0.65" Color="#A0000000"/>
-                                        <GradientStop Offset="1" Color="#F0101814"/>
+                                        <GradientStop Offset="0" Color="{DynamicResource ArtworkShadeTop}"/>
+                                        <GradientStop Offset="0.35" Color="{DynamicResource ArtworkShadeMiddle}"/>
+                                        <GradientStop Offset="0.65" Color="{DynamicResource ArtworkShadeLower}"/>
+                                        <GradientStop Offset="1" Color="{DynamicResource ArtworkShadeBottom}"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
                             </Border>
                             <Grid RowDefinitions="Auto,*,Auto,48" Margin="12">
                                 <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Text="♫  SPOTIFY" Classes="label" Foreground="#1ED760"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Spotify.Status}" FontSize="11" Foreground="#EAF0F7"/>
+                                    <TextBlock Text="♫  SPOTIFY" Classes="label" Foreground="{DynamicResource TertiaryBrush}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Spotify.Status}" FontSize="11" Foreground="{DynamicResource TextBrush}"/>
                                 </Grid>
                                 <StackPanel Grid.Row="2" Margin="0,8,0,10">
                                     <TextBlock Text="{Binding Spotify.TrackName}" FontSize="16" FontWeight="SemiBold"
                                                TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock Text="{Binding Spotify.ArtistName}" FontSize="13" Foreground="#D7E2DC"
+                                    <TextBlock Text="{Binding Spotify.ArtistName}" FontSize="13" Foreground="{DynamicResource MutedTextBrush}"
                                                TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
                                 </StackPanel>
                                 <Grid Grid.Row="3" ColumnDefinitions="*,*,*">
                                     <Button Classes="transport" Content="|‹" Command="{Binding Spotify.PreviousTrackCommand}" Margin="0,0,4,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Previous track"/>
-                                    <Button Classes="transport play" Grid.Column="1" Content="{Binding Spotify.PlaybackIcon}" Command="{Binding Spotify.TogglePlaybackCommand}" Margin="4,0" HorizontalAlignment="Stretch" FontSize="20" Background="#1ED760" Foreground="#092416" CornerRadius="24" AutomationProperties.Name="{Binding Spotify.PlaybackLabel}"/>
+                                    <Button Classes="transport play" Grid.Column="1" Content="{Binding Spotify.PlaybackIcon}" Command="{Binding Spotify.TogglePlaybackCommand}" Margin="4,0" HorizontalAlignment="Stretch" FontSize="20" Background="{DynamicResource TertiaryBrush}" Foreground="{DynamicResource CanvasBrush}" CornerRadius="24" AutomationProperties.Name="{Binding Spotify.PlaybackLabel}"/>
                                     <Button Classes="transport" Grid.Column="2" Content="›|" Command="{Binding Spotify.NextTrackCommand}" Margin="4,0,0,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Next track"/>
                                 </Grid>
                             </Grid>
@@ -263,7 +314,7 @@
                             <TextBlock Text="{Binding PlugAvailability}" Classes="muted"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding PlugSummary}" FontSize="18" Foreground="#8CDDED" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding PlugSummary}" FontSize="18" Foreground="{DynamicResource PrimarySoftBrush}" VerticalAlignment="Center"/>
                             <Button Content="Refresh" Command="{Binding RefreshDevicesCommand}" Padding="16,0"
                                     AutomationProperties.Name="Refresh device list"/>
                         </StackPanel>
@@ -329,7 +380,7 @@
             <Border x:Name="FeaturePanel" Grid.Column="1" Classes="card" Margin="8,0,8,8" IsVisible="False">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16" MaxWidth="400">
                     <TextBlock x:Name="FeatureTitle" FontSize="28" FontWeight="Bold" TextAlignment="Center"/>
-                    <TextBlock Text="Not connected" Foreground="#8CDDED" FontSize="18" TextAlignment="Center"/>
+                    <TextBlock Text="Not connected" Foreground="{DynamicResource PrimarySoftBrush}" FontSize="18" TextAlignment="Center"/>
                     <TextBlock x:Name="FeatureDescription" TextWrapping="Wrap" TextAlignment="Center" Classes="muted"/>
                     <Button Content="Back to overview" Click="Navigate" Tag="Overview" HorizontalAlignment="Center" Padding="20,0"/>
                 </StackPanel>

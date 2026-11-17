@@ -47,11 +47,10 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
     public ObservableCollection<SmartDeviceViewModel> SmartDevices { get; } = [];
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasOverviewLight))]
-    private SmartDeviceViewModel? _overviewLight;
+    public ObservableCollection<SmartDeviceViewModel> OverviewLights { get; } = [];
 
-    public bool HasOverviewLight => OverviewLight != null;
+    public bool HasOverviewLights => OverviewLights.Count > 0;
+    public int OverviewLightColumns => OverviewLights.Count > 1 ? 2 : 1;
     public bool HasNoSmartPlugs => SmartDevices.Count == 0;
     public string PlugSummary => SmartDevices.Count == 0 ? "No plugs connected" :
         $"{SmartDevices.Count(p => p.HasState && p.IsOn)} on · {SmartDevices.Count(p => p.HasState && !p.IsOn)} off";
@@ -62,6 +61,25 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
     public SpotifyViewModel Spotify { get; }
 
     public bool HasNoWeatherLocations => WeatherLocations.Count == 0;
+    public bool HasMultipleWeatherLocations => WeatherLocations.Count > 1;
+    private int _weatherLocationIndex;
+    public WeatherLocationViewModel? SelectedWeatherLocation => WeatherLocations.Count == 0 ? null : WeatherLocations[_weatherLocationIndex];
+    public string WeatherLocationPosition => WeatherLocations.Count == 0 ? "" : $"{_weatherLocationIndex + 1} / {WeatherLocations.Count}";
+
+    [RelayCommand]
+    private void PreviousWeatherLocation() => ChangeWeatherLocation(-1);
+
+    [RelayCommand]
+    private void NextWeatherLocation() => ChangeWeatherLocation(1);
+
+    private void ChangeWeatherLocation(int offset)
+    {
+        if (WeatherLocations.Count < 2) return;
+        _weatherLocationIndex = (_weatherLocationIndex + offset + WeatherLocations.Count) % WeatherLocations.Count;
+        OnPropertyChanged(nameof(SelectedWeatherLocation));
+        OnPropertyChanged(nameof(WeatherLocationPosition));
+    }
+
 
     public bool HasNoCalendarEvents => CalendarEvents.Count == 0;
 
@@ -157,8 +175,7 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
             if (!_isDisposed)
             {
-                location.Temperature = $"{weather.Temperature:0}";
-                location.Description = weather.Description;
+                location.Update(weather);
             }
         }
         catch (OperationCanceledException) when (_isDisposed)
@@ -171,8 +188,7 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
 
             if (!_isDisposed)
             {
-                location.Temperature = "--";
-                location.Description = "Weather unavailable";
+                location.SetUnavailable();
             }
         }
     }
@@ -212,18 +228,23 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
     [RelayCommand]
     private async Task RefreshDevicesAsync()
     {
-        if (_isDisposed || _isUpdatingDevices) return;
+        if (_isDisposed || _isUpdatingDevices) 
+            return;
+        
         _isUpdatingDevices = true;
         _deviceLoadStatus = "Loading devices…";
         OnPropertyChanged(nameof(PlugAvailability));
         try
         {
             var devices = await _smartDeviceService.GetDevicesAsync(_cancellationTokenSource.Token);
-            if (_isDisposed) return;
+            
+            if (_isDisposed) 
+                return;
 
             // Keep existing view models so their in-flight power commands remain valid.
             foreach (var device in SmartDevices.Where(d => !devices.Any(m => m.Id == d.Id)).ToArray())
                 SmartDevices.Remove(device);
+            
             foreach (var model in devices)
             {
                 var existing = SmartDevices.FirstOrDefault(d => d.Id == model.Id);
@@ -238,15 +259,17 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
         catch (Exception exception)
         {
             Debug.WriteLine($"Unable to load smart devices: {exception.Message}");
+            
             if (!_isDisposed) _deviceLoadStatus = "Devices unavailable · Refresh to retry";
         }
         finally
         {
             _isUpdatingDevices = false;
+            
             if (!_isDisposed)
             {
                 OnPropertyChanged(nameof(PlugAvailability));
-                UpdateOverviewLight();
+                UpdateOverviewLights();
             }
         }
     }
@@ -260,32 +283,38 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
             device.Dispose();
             _trackedDevices.Remove(device);
         }
+        
         foreach (var device in SmartDevices)
             if (_trackedDevices.Add(device)) device.PropertyChanged += OnPlugChanged;
 
         OnPropertyChanged(nameof(HasNoSmartPlugs));
         OnPropertyChanged(nameof(PlugSummary));
         OnPropertyChanged(nameof(PlugAvailability));
-        UpdateOverviewLight();
+        UpdateOverviewLights();
     }
 
-    private void UpdateOverviewLight()
+    private void UpdateOverviewLights()
     {
         if (_isUpdatingDevices || _isDisposed) return;
-        // Keep the same light through renames and temporary outages.
-        if (OverviewLight != null && SmartDevices.Contains(OverviewLight)) return;
+        // Retain known lights through temporary outages that omit capabilities.
+        foreach (var light in OverviewLights.Where(light => !SmartDevices.Contains(light)).ToArray())
+            OverviewLights.Remove(light);
 
-        var lights = SmartDevices.Where(device => device.SupportsBrightness
-            || device.SupportsColour || device.SupportsColourTemperature);
-        OverviewLight = lights.FirstOrDefault(device =>
-            string.Equals(device.Name, "Bedside Lamp", StringComparison.OrdinalIgnoreCase))
-            ?? lights.FirstOrDefault();
+        foreach (var device in SmartDevices.Where(device => device.SupportsBrightness
+            || device.SupportsColour || device.SupportsColourTemperature))
+        {
+            if (!OverviewLights.Contains(device)) OverviewLights.Add(device);
+        }
+
+        OnPropertyChanged(nameof(HasOverviewLights));
+        OnPropertyChanged(nameof(OverviewLightColumns));
     }
 
     private void OnPlugChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SmartDeviceViewModel.Capabilities))
-            UpdateOverviewLight();
+            UpdateOverviewLights();
+        
         if (e.PropertyName is nameof(SmartDeviceViewModel.HasState) or nameof(SmartDeviceViewModel.IsOn))
         {
             OnPropertyChanged(nameof(PlugSummary));

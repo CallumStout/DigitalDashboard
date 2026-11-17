@@ -14,6 +14,7 @@ public partial class ClockView : UserControl
         EnableMouseDragScrolling(WeatherScroller);
         EnableMouseDragScrolling(EventsScroller);
         EnableMouseDragScrolling(PlugsScroller);
+        EnableMouseDragScrolling(LightsScroller);
     }
 
     private void Navigate(object? sender, RoutedEventArgs e)
