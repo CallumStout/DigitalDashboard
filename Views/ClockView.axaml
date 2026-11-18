@@ -157,7 +157,7 @@
                     </Border>
                 </Grid>
                 <Grid Grid.Column="1" RowDefinitions="*,184" Margin="4,0">
-                    <Border Classes="card" Padding="10">
+                    <Border Classes="card" Padding="8">
                         <!-- Centre navigation in the space remaining below the forecast. -->
                         <Grid x:Name="WeatherLayout" RowDefinitions="Auto,*" SizeChanged="WeatherLayoutSizeChanged">
                             <TextBlock Text="No weather location configured" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding HasNoWeatherLocations}"/>
@@ -189,7 +189,6 @@
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate x:DataType="models:WeatherForecast">
                                                             <Border Background="{DynamicResource ControlBrush}" CornerRadius="6" Margin="1,0" Padding="1,3" ToolTip.Tip="{Binding Description}">
-                                                                <!-- Fixed slots keep glyph metrics from shifting the forecast rows. -->
                                                                 <Grid RowDefinitions="18,28,24">
                                                                     <TextBlock Grid.Row="0" Text="{Binding Time}" FontSize="12"
                                                                                TextAlignment="Center" VerticalAlignment="Center"
@@ -214,7 +213,7 @@
                                     </ContentControl.ContentTemplate>
                                 </ContentControl>
                             </ScrollViewer>
-                            <Grid x:Name="WeatherNavigation" Grid.Row="1" ColumnDefinitions="48,*,48" Margin="0,6" VerticalAlignment="Center" IsVisible="{Binding HasMultipleWeatherLocations}">
+                            <Grid x:Name="WeatherNavigation" Grid.Row="1" ColumnDefinitions="48,*,48" Margin="0,9,0,7" VerticalAlignment="Center" IsVisible="{Binding HasMultipleWeatherLocations}">
                                 <Button Content="‹" FontSize="24" Command="{Binding PreviousWeatherLocationCommand}" AutomationProperties.Name="Previous weather location"/>
                                 <TextBlock Grid.Column="1" Text="{Binding WeatherLocationPosition}" FontSize="14" Foreground="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <Button Grid.Column="2" Content="›" FontSize="24" Command="{Binding NextWeatherLocationCommand}" AutomationProperties.Name="Next weather location"/>
