@@ -43,6 +43,9 @@ public partial class ClockViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private string _date = string.Empty;
 
+    [ObservableProperty]
+    private bool _isNightMode;
+
     public IReadOnlyList<WeatherLocationViewModel> WeatherLocations { get; }
 
     public ObservableCollection<SmartDeviceViewModel> SmartDevices { get; } = [];

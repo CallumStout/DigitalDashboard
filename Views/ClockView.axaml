@@ -109,7 +109,16 @@
                         <Button Classes="nav" Content="Plugs" Click="Navigate" Tag="Plugs"/>
                         <Button Classes="nav" Content="Security" Click="Navigate" Tag="Security"/>
                     </StackPanel>
-                    <TextBlock Grid.Row="1" Text="YOUR HOME&#10;AT A GLANCE" Classes="label" FontSize="12" Margin="6,0,0,8"/>
+                    <StackPanel Grid.Row="1" Margin="0,0,0,8">
+                        <TextBlock Text="Night mode" Classes="label" FontSize="12" TextAlignment="Center"/>
+                        <ToggleSwitch IsChecked="{Binding IsNightMode, Mode=TwoWay}"
+                                      OnContent="" OffContent=""
+                                      AutomationProperties.Name="Night mode"
+                                      HorizontalAlignment="Center"
+                                      MinHeight="44"
+                                      Margin="0,0,0,8"/>
+                        <TextBlock Text="YOUR HOME&#10;AT A GLANCE" Classes="label" FontSize="12" TextAlignment="Center"/>
+                    </StackPanel>
                 </Grid>
             </Border>
             <Grid x:Name="OverviewPanel" Grid.Column="1" ColumnDefinitions="*,*,*" Margin="8,0,8,8">
@@ -388,5 +397,10 @@
                 </StackPanel>
             </Border>
         </Grid>
+        <Border Grid.RowSpan="2"
+                Background="Black"
+                Opacity="0.75"
+                IsVisible="{Binding IsNightMode}"
+                IsHitTestVisible="False"/>
     </Grid>
 </UserControl>
