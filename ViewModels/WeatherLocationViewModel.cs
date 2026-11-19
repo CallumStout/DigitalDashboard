@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DigitalDashboard.Models;
+using Material.Icons;
 
 namespace DigitalDashboard.ViewModels;
 
@@ -11,7 +12,7 @@ public partial class WeatherLocationViewModel : ViewModelBase
     public string Name => Location.Name;
     [ObservableProperty] private string _temperature = "--";
     [ObservableProperty] private string _description = "Loading weather…";
-    [ObservableProperty] private string _icon = "–";
+    [ObservableProperty] private MaterialIconKind _icon = MaterialIconKind.Minus;
     [ObservableProperty] private string _humidity = "–";
     [ObservableProperty] private string _wind = "–";
     [ObservableProperty] private string _uv = "–";
@@ -37,7 +38,8 @@ public partial class WeatherLocationViewModel : ViewModelBase
     {
         Temperature = "--";
         Description = "Weather unavailable";
-        Icon = Humidity = Wind = Uv = "–";
+        Icon = MaterialIconKind.Minus;
+        Humidity = Wind = Uv = "–";
         Forecast = [];
     }
 }

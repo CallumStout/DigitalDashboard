@@ -1,4 +1,5 @@
 using DigitalDashboard.Models;
+using Material.Icons;
 using System;
 using System.Linq;
 using System.Globalization;
@@ -57,16 +58,16 @@ public class WeatherService : IWeatherService
         };
     }
 
-    private static string GetIcon(int? code, int? isDay) => code switch
+    private static MaterialIconKind GetIcon(int? code, int? isDay) => code switch
     {
-        0 or 1 => isDay == 0 ? "☾" : "☀",
-        2 => isDay == 0 ? "☾" : "⛅",
-        3 => "☁",
-        45 or 48 => "≋",
-        >= 51 and <= 67 or >= 80 and <= 82 => "☂",
-        >= 71 and <= 77 or 85 or 86 => "❄",
-        >= 95 => "ϟ",
-        _ => "–"
+        0 or 1 => isDay == 0 ? MaterialIconKind.WeatherNight : MaterialIconKind.WeatherSunny,
+        2 => isDay == 0 ? MaterialIconKind.WeatherNightPartlyCloudy : MaterialIconKind.WeatherPartlyCloudy,
+        3 => MaterialIconKind.WeatherCloudy,
+        45 or 48 => MaterialIconKind.WeatherFog,
+        >= 51 and <= 67 or >= 80 and <= 82 => MaterialIconKind.WeatherRainy,
+        >= 71 and <= 77 or 85 or 86 => MaterialIconKind.WeatherSnowy,
+        >= 95 => MaterialIconKind.WeatherLightning,
+        _ => MaterialIconKind.Minus
     };
 
     private static string GetDescription(int? weatherCode)

@@ -35,11 +35,32 @@ Previous, play/pause, and next controls keep 48-pixel minimum touch targets with
 the existing card margins. Larger artwork fills the card behind a dark gradient,
 with track details and controls overlaid inside the padding. Long track names
 wrap to two lines and then truncate.
-Controls are disabled during user playback commands and when no track is available.
+Controls are disabled during user playback commands and when no controllable device is available.
 Routine polling leaves buttons enabled; a command pressed during a poll waits for
 that read to finish instead of being dropped. Open Spotify
 on a playback device to start listening. Playback refreshes every five seconds;
 connection failures show an offline state and retry automatically.
+
+## Media page
+
+Choose **Media** in the sidebar for the Spotify remote. Music continues on your
+active Spotify device. The page shares playback state with the overview card and
+shows artwork, progress, elapsed/duration labels, device name, previous/play/next,
+shuffle, and repeat (off, context, track).
+
+Browse Liked Songs, Playlists, Recent, Top Tracks, or search for tracks by song or
+artist. Tap a track or playlist to start it on the active device. Library lists
+load on demand with **Load more**; Recent shows up to 50 recent plays with duplicate
+tracks removed. Failed loads retain existing items and offer **Retry**.
+
+The authentication service requests playback read/modify/currently-playing,
+library read, private/collaborative playlists, recently played, and top-items
+permissions. Saved tokens missing any of these scopes trigger browser sign-in on
+the next launch. Approve the expanded permissions; no token-file deletion is
+needed. The existing client ID and loopback redirect configuration are unchanged.
+Open Spotify on your listening device first. Spotify Premium is required for
+remote playback controls. A failed control request displays an error while
+keeping the current track visible.
 
 ## Smart plug
 

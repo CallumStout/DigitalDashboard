@@ -2,12 +2,21 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 
 public class SpotifyAuthenticationService
 {
+    internal static readonly string[] RequiredScopes =
+    [
+        Scopes.UserReadPlaybackState, Scopes.UserModifyPlaybackState,
+        Scopes.UserReadCurrentlyPlaying, Scopes.UserLibraryRead,
+        Scopes.PlaylistReadPrivate, Scopes.PlaylistReadCollaborative,
+        Scopes.UserReadRecentlyPlayed, Scopes.UserTopRead
+    ];
+
     private readonly string _clientId;
     private readonly string _tokenPath;
 
@@ -32,7 +41,8 @@ public class SpotifyAuthenticationService
 
             var savedToken = JsonSerializer.Deserialize<PKCETokenResponse>(json);
 
-            if (savedToken != null)
+            if (savedToken != null && !string.IsNullOrWhiteSpace(savedToken.RefreshToken)
+                && RequiredScopes.All(scope => (savedToken.Scope ?? "").Split(' ').Contains(scope)))
             {
                 return savedToken;
             }
@@ -46,12 +56,7 @@ public class SpotifyAuthenticationService
         {
             CodeChallengeMethod = "S256",
             CodeChallenge = challenge,
-            Scope = new[]
-            {
-                Scopes.UserReadPlaybackState,
-                Scopes.UserReadCurrentlyPlaying,
-                Scopes.UserModifyPlaybackState
-            }
+            Scope = RequiredScopes
         };
 
         var loginUri = loginRequest.ToUri();
@@ -111,6 +116,7 @@ public class SpotifyAuthenticationService
         }
 
         string refreshToken = token.RefreshToken;
+        string grantedScope = token.Scope;
 
         var authenticator = new PKCEAuthenticator(_clientId, token);
 
@@ -126,6 +132,12 @@ public class SpotifyAuthenticationService
                 {
                     refreshToken = refreshedToken.RefreshToken;
                 }
+
+                // OAuth refresh responses may omit an unchanged scope.
+                if (string.IsNullOrWhiteSpace(refreshedToken.Scope))
+                    refreshedToken.Scope = grantedScope;
+                else
+                    grantedScope = refreshedToken.Scope;
 
                 var json = JsonSerializer.Serialize(refreshedToken);
                 var temporaryPath = _tokenPath + ".tmp";

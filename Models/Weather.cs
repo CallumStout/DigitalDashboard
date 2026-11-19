@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Material.Icons;
 
 namespace DigitalDashboard.Models;
 
@@ -6,7 +7,7 @@ public class Weather
 {
     public double Temperature { get; init; }
     public string Description { get; init; } = string.Empty;
-    public string Icon { get; init; } = "–";
+    public MaterialIconKind Icon { get; init; } = MaterialIconKind.Minus;
     public double? High { get; init; }
     public double? Humidity { get; init; }
     public double? WindSpeed { get; init; }
@@ -15,4 +16,4 @@ public class Weather
     public IReadOnlyList<WeatherForecast> Forecast { get; init; } = [];
 }
 
-public record WeatherForecast(string Time, string Temperature, string Icon, string Description);
+public record WeatherForecast(string Time, string Temperature, MaterialIconKind Icon, string Description);

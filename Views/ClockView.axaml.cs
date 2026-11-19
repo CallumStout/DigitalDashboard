@@ -30,7 +30,8 @@ public partial class ClockView : UserControl
 
         OverviewPanel.IsVisible = section == "Overview";
         PlugsPanel.IsVisible = section == "Plugs";
-        FeaturePanel.IsVisible = !OverviewPanel.IsVisible && !PlugsPanel.IsVisible;
+        MediaPanel.IsVisible = section == "Media";
+        FeaturePanel.IsVisible = !OverviewPanel.IsVisible && !PlugsPanel.IsVisible && !MediaPanel.IsVisible;
         FeatureTitle.Text = section;
         FeatureDescription.Text = section switch
         {

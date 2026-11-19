@@ -2,7 +2,10 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Material.Icons;
 using SpotifyAPI.Web;
+using DigitalDashboard.Models;
+using System.Collections.ObjectModel;
 using System;
 using System.IO;
 using System.Linq;
@@ -36,19 +39,119 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
     [NotifyPropertyChangedFor(nameof(PlaybackLabel))]
     private bool _isPlaying;
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ToggleShuffleCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CycleRepeatCommand))]
     [NotifyCanExecuteChangedFor(nameof(TogglePlaybackCommand))]
     [NotifyCanExecuteChangedFor(nameof(NextTrackCommand))]
     [NotifyCanExecuteChangedFor(nameof(PreviousTrackCommand))]
     private bool _isLoading;
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ToggleShuffleCommand))]
+    [NotifyCanExecuteChangedFor(nameof(CycleRepeatCommand))]
     [NotifyCanExecuteChangedFor(nameof(TogglePlaybackCommand))]
     [NotifyCanExecuteChangedFor(nameof(NextTrackCommand))]
     [NotifyCanExecuteChangedFor(nameof(PreviousTrackCommand))]
     private bool _hasPlayback;
     [ObservableProperty] private string _status = "Connecting";
 
+    [ObservableProperty] private bool _isConnected;
+    [ObservableProperty] private string _deviceLabel = "Open Spotify on your listening device";
+    [ObservableProperty] private string _playbackError = "";
+    [ObservableProperty] private double _progressPercent;
+    [ObservableProperty] private string _elapsed = "0:00";
+    [ObservableProperty] private string _duration = "0:00";
+    [ObservableProperty] private bool _shuffleEnabled;
+    [ObservableProperty] private string _repeatMode = "off";
+    [ObservableProperty] private bool _isBrowsing;
+    [ObservableProperty] private bool _isLibraryLoading;
+    [ObservableProperty] private bool _hasMore;
+    [ObservableProperty] private bool _libraryFailed;
+    [ObservableProperty] private string _category = "Liked Songs";
+    [ObservableProperty] private string _libraryStatus = "";
+    [ObservableProperty] private string _searchQuery = "";
+    [ObservableProperty] private bool _isSearch;
+    private int _libraryOffset;
+    private string _submittedQuery = "";
+    public ObservableCollection<SpotifyLibraryItem> LibraryItems { get; } = [];
+
+    [RelayCommand]
+    private async Task BrowseAsync(string category)
+    {
+        if (_disposed || IsLibraryLoading) return;
+        Category = category;
+        IsSearch = category == "Search";
+        _submittedQuery = "";
+        IsBrowsing = true;
+        LibraryItems.Clear();
+        _libraryOffset = 0;
+        HasMore = false;
+        LibraryFailed = false;
+        LibraryStatus = IsSearch ? "Enter a song or artist to search" : "";
+        if (!IsSearch) await LoadLibraryAsync();
+    }
+
+    [RelayCommand]
+    private void CloseLibrary() => IsBrowsing = false;
+
+    [RelayCommand]
+    private async Task SearchAsync()
+    {
+        if (_disposed || IsLibraryLoading || string.IsNullOrWhiteSpace(SearchQuery)) return;
+        _submittedQuery = SearchQuery.Trim();
+        LibraryItems.Clear();
+        _libraryOffset = 0;
+        await LoadLibraryAsync();
+    }
+
+    [RelayCommand]
+    private async Task LoadLibraryAsync()
+    {
+        if (_disposed || IsLibraryLoading || (IsSearch && string.IsNullOrWhiteSpace(_submittedQuery))) return;
+        IsLibraryLoading = true;
+        LibraryFailed = false;
+        LibraryStatus = "Loading…";
+        try
+        {
+            var page = await _spotifyService.GetLibraryAsync(Category, _libraryOffset, _submittedQuery).WaitAsync(_token);
+            if (_disposed) return;
+            foreach (var item in page.Items) LibraryItems.Add(item);
+            _libraryOffset += IsSearch ? 10 : 50;
+            HasMore = page.HasMore;
+            LibraryStatus = LibraryItems.Count == 0 ? "No music found" : $"{LibraryItems.Count} items";
+        }
+        catch (OperationCanceledException) when (_token.IsCancellationRequested) { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(ex);
+            if (!_disposed)
+            {
+                LibraryFailed = true;
+                LibraryStatus = "Unable to load music. Tap Retry.";
+            }
+        }
+        finally { if (!_disposed) IsLibraryLoading = false; }
+    }
+
+    [RelayCommand]
+    private Task PlayItemAsync(SpotifyLibraryItem item)
+    {
+        if (item == null || _disposed || IsLoading) return Task.CompletedTask;
+        IsBrowsing = false;
+        return UpdateAsync(() => _spotifyService.PlayAsync(item));
+    }
+
+    [RelayCommand(CanExecute = nameof(CanControl))]
+    private Task ToggleShuffleAsync() => UpdateAsync(() => _spotifyService.SetShuffleAsync(!ShuffleEnabled));
+
+    [RelayCommand(CanExecute = nameof(CanControl))]
+    private Task CycleRepeatAsync() => UpdateAsync(() => _spotifyService.SetRepeatAsync(
+        RepeatMode == "off" ? "context" : RepeatMode == "context" ? "track" : "off"));
+
+    private static string FormatTime(int milliseconds) =>
+        TimeSpan.FromMilliseconds(Math.Max(0, milliseconds)).ToString(@"m\:ss");
+
     public bool HasArtwork => AlbumArtwork != null;
-    public string PlaybackIcon => IsPlaying ? "Ⅱ" : "▶";
+    public MaterialIconKind PlaybackIcon => IsPlaying ? MaterialIconKind.Pause : MaterialIconKind.Play;
     public string PlaybackLabel => IsPlaying ? "Pause Spotify" : "Play Spotify";
 
     public SpotifyViewModel(ISpotifyService spotifyService, HttpClient httpClient)
@@ -101,6 +204,7 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
             if (command != null)
             {
                 Status = "Updating…";
+                PlaybackError = "";
                 await command().WaitAsync(_token);
             }
 
@@ -114,7 +218,15 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
             TrackName = track?.Name ?? "Nothing playing";
             ArtistName = track == null ? "Open Spotify on a device" :
                 string.Join(", ", track.Artists?.Select(artist => artist.Name) ?? Enumerable.Empty<string>());
-            HasPlayback = track != null;
+            IsConnected = true;
+            HasPlayback = playback?.Device != null && !playback.Device.IsRestricted;
+            DeviceLabel = playback?.Device == null ? "Open Spotify on your listening device"
+                : $"{(playback.IsPlaying ? "Playing" : "Connected")} on {playback.Device.Name}";
+            Elapsed = FormatTime(playback?.ProgressMs ?? 0);
+            Duration = FormatTime(track?.DurationMs ?? 0);
+            ProgressPercent = track?.DurationMs > 0 ? Math.Clamp(100.0 * (playback?.ProgressMs ?? 0) / track.DurationMs, 0, 100) : 0;
+            ShuffleEnabled = playback?.ShuffleState ?? false;
+            RepeatMode = playback?.RepeatState ?? "off";
             IsPlaying = track != null && playback!.IsPlaying;
             Status = track == null ? "Idle" : IsPlaying ? "Playing" : "Paused";
 
@@ -134,6 +246,15 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
             if (_disposed) 
                 return;
 
+            if (command != null)
+            {
+                PlaybackError = "Could not control Spotify. Start playback on your device and check Premium access.";
+                return;
+            }
+            IsConnected = false;
+            DeviceLabel = "Spotify unavailable · reconnecting";
+            ProgressPercent = 0;
+            Elapsed = Duration = "0:00";
             HasPlayback = false;
             IsPlaying = false;
             TrackName = "Spotify unavailable";
@@ -208,5 +329,7 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
         TogglePlaybackCommand.NotifyCanExecuteChanged();
         NextTrackCommand.NotifyCanExecuteChanged();
         PreviousTrackCommand.NotifyCanExecuteChanged();
+        ToggleShuffleCommand.NotifyCanExecuteChanged();
+        CycleRepeatCommand.NotifyCanExecuteChanged();
     }
 }

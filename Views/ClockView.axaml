@@ -1,7 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:DigitalDashboard.ViewModels"
+             xmlns:views="using:DigitalDashboard.Views"
              xmlns:models="using:DigitalDashboard.Models"
+             xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="DigitalDashboard.Views.ClockView"
              x:DataType="vm:ClockViewModel">
     <UserControl.Styles>
@@ -105,6 +107,7 @@
                 <Grid RowDefinitions="*,Auto">
                     <StackPanel Spacing="8">
                         <Button x:Name="OverviewButton" Classes="nav active" Content="Overview" Click="Navigate" Tag="Overview"/>
+                        <Button Classes="nav" Content="Media" Click="Navigate" Tag="Media"/>
                         <Button Classes="nav" Content="Climate" Click="Navigate" Tag="Climate"/>
                         <Button Classes="nav" Content="Plugs" Click="Navigate" Tag="Plugs"/>
                         <Button Classes="nav" Content="Security" Click="Navigate" Tag="Security"/>
@@ -173,7 +176,8 @@
                                                         <TextBlock Text="{Binding Temperature}" FontSize="44" FontWeight="Bold"/>
                                                         <TextBlock Text="°C" Foreground="{DynamicResource SecondaryBrush}" FontSize="18" VerticalAlignment="Bottom" Margin="0,0,0,6"/>
                                                     </StackPanel>
-                                                    <TextBlock Grid.Column="1" Text="{Binding Icon}" Foreground="{DynamicResource SecondaryBrush}" FontSize="42" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <icons:MaterialIcon Grid.Column="1" Kind="{Binding Icon}" Foreground="{DynamicResource SecondaryBrush}"
+                                                                        Width="42" Height="42" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Grid>
                                                 <TextBlock Text="{Binding Description}" FontSize="16" Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap"/>
                                                 <Border Background="{DynamicResource CanvasBrush}" CornerRadius="7" Padding="4,8">
@@ -193,14 +197,9 @@
                                                                     <TextBlock Grid.Row="0" Text="{Binding Time}" FontSize="12"
                                                                                TextAlignment="Center" VerticalAlignment="Center"
                                                                                Foreground="{DynamicResource MutedTextBrush}"/>
-                                                                    <Border Grid.Row="1" Width="26" Height="26"
-                                                                            HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                                        <Viewbox Width="22" Height="22" Stretch="Uniform"
-                                                                                 HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                                            <TextBlock Text="{Binding Icon}" FontSize="20" TextAlignment="Center"
-                                                                                       Foreground="{DynamicResource SecondaryBrush}"/>
-                                                                        </Viewbox>
-                                                                    </Border>
+                                                                    <icons:MaterialIcon Grid.Row="1" Kind="{Binding Icon}" Width="22" Height="22"
+                                                                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                                        Foreground="{DynamicResource SecondaryBrush}"/>
                                                                     <TextBlock Grid.Row="2" Text="{Binding Temperature}" FontSize="16" FontWeight="Bold"
                                                                                TextAlignment="Center" VerticalAlignment="Center"/>
                                                                 </Grid>
@@ -214,9 +213,13 @@
                                 </ContentControl>
                             </ScrollViewer>
                             <Grid x:Name="WeatherNavigation" Grid.Row="1" ColumnDefinitions="48,*,48" Margin="0,10,0,6" VerticalAlignment="Center" IsVisible="{Binding HasMultipleWeatherLocations}">
-                                <Button Content="‹" FontSize="24" Command="{Binding PreviousWeatherLocationCommand}" AutomationProperties.Name="Previous weather location"/>
+                                <Button Command="{Binding PreviousWeatherLocationCommand}" AutomationProperties.Name="Previous weather location">
+                                    <icons:MaterialIcon Kind="ChevronLeft" Width="24" Height="24"/>
+                                </Button>
                                 <TextBlock Grid.Column="1" Text="{Binding WeatherLocationPosition}" FontSize="14" Foreground="{DynamicResource MutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <Button Grid.Column="2" Content="›" FontSize="24" Command="{Binding NextWeatherLocationCommand}" AutomationProperties.Name="Next weather location"/>
+                                <Button Grid.Column="2" Command="{Binding NextWeatherLocationCommand}" AutomationProperties.Name="Next weather location">
+                                    <icons:MaterialIcon Kind="ChevronRight" Width="24" Height="24"/>
+                                </Button>
                             </Grid>
                         </Grid>
                     </Border>
@@ -234,9 +237,13 @@
                         <StackPanel Spacing="8">
                             <TextBlock Text="THERMOSTAT" Classes="label"/>
                             <Grid ColumnDefinitions="48,*,48">
-                                <Button Content="−" FontSize="24" IsEnabled="False" AutomationProperties.Name="Lower temperature"/>
+                                <Button IsEnabled="False" AutomationProperties.Name="Lower temperature">
+                                    <icons:MaterialIcon Kind="Minus" Width="24" Height="24"/>
+                                </Button>
                                 <TextBlock Grid.Column="1" Text="—°C" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <Button Grid.Column="2" Content="+" FontSize="24" IsEnabled="False" AutomationProperties.Name="Raise temperature"/>
+                                <Button Grid.Column="2" IsEnabled="False" AutomationProperties.Name="Raise temperature">
+                                    <icons:MaterialIcon Kind="Plus" Width="24" Height="24"/>
+                                </Button>
                             </Grid>
                             <TextBlock Text="Not connected" Classes="muted"/>
                         </StackPanel>
@@ -283,8 +290,8 @@
                         <Grid>
                             <Image Source="{Binding Spotify.AlbumArtwork}" Stretch="UniformToFill"
                                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-                            <TextBlock Text="♫" IsVisible="{Binding !Spotify.HasArtwork}" FontSize="64"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TertiaryDimBrush}"/>
+                            <icons:MaterialIcon Kind="Music" IsVisible="{Binding !Spotify.HasArtwork}" Width="64" Height="64"
+                                                HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource TertiaryDimBrush}"/>
                             <Border IsHitTestVisible="False">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
@@ -297,7 +304,10 @@
                             </Border>
                             <Grid RowDefinitions="Auto,*,Auto,48" Margin="12">
                                 <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Text="♫  SPOTIFY" Classes="label" Foreground="{DynamicResource TertiaryBrush}"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <icons:MaterialIcon Kind="Spotify" Width="18" Height="18" VerticalAlignment="Center" Foreground="{DynamicResource TertiaryBrush}"/>
+                                        <TextBlock Text="SPOTIFY" Classes="label" VerticalAlignment="Center" Foreground="{DynamicResource TertiaryBrush}"/>
+                                    </StackPanel>
                                     <TextBlock Grid.Column="1" Text="{Binding Spotify.Status}" FontSize="14" Foreground="{DynamicResource TextBrush}"/>
                                 </Grid>
                                 <StackPanel Grid.Row="2" Margin="0,8,0,10">
@@ -307,9 +317,15 @@
                                                TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
                                 </StackPanel>
                                 <Grid Grid.Row="3" ColumnDefinitions="*,*,*">
-                                    <Button Classes="transport" Content="|‹" Command="{Binding Spotify.PreviousTrackCommand}" Margin="0,0,4,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Previous track"/>
-                                    <Button Classes="transport play" Grid.Column="1" Content="{Binding Spotify.PlaybackIcon}" Command="{Binding Spotify.TogglePlaybackCommand}" Margin="4,0" HorizontalAlignment="Stretch" FontSize="20" Background="{DynamicResource TertiaryBrush}" Foreground="{DynamicResource CanvasBrush}" CornerRadius="24" AutomationProperties.Name="{Binding Spotify.PlaybackLabel}"/>
-                                    <Button Classes="transport" Grid.Column="2" Content="›|" Command="{Binding Spotify.NextTrackCommand}" Margin="4,0,0,0" HorizontalAlignment="Stretch" FontSize="20" AutomationProperties.Name="Next track"/>
+                                    <Button Classes="transport" Command="{Binding Spotify.PreviousTrackCommand}" Margin="0,0,4,0" HorizontalAlignment="Stretch" AutomationProperties.Name="Previous track">
+                                        <icons:MaterialIcon Kind="SkipPrevious" Width="24" Height="24"/>
+                                    </Button>
+                                    <Button Classes="transport play" Grid.Column="1" Command="{Binding Spotify.TogglePlaybackCommand}" Margin="4,0" HorizontalAlignment="Stretch" Background="{DynamicResource TertiaryBrush}" Foreground="{DynamicResource CanvasBrush}" CornerRadius="24" AutomationProperties.Name="{Binding Spotify.PlaybackLabel}">
+                                        <icons:MaterialIcon Kind="{Binding Spotify.PlaybackIcon}" Width="24" Height="24"/>
+                                    </Button>
+                                    <Button Classes="transport" Grid.Column="2" Command="{Binding Spotify.NextTrackCommand}" Margin="4,0,0,0" HorizontalAlignment="Stretch" AutomationProperties.Name="Next track">
+                                        <icons:MaterialIcon Kind="SkipNext" Width="24" Height="24"/>
+                                    </Button>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -387,6 +403,7 @@
                 <TextBlock Grid.Row="1" IsVisible="{Binding HasNoSmartPlugs}" Text="No devices connected yet" Classes="muted"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
+            <views:MediaView x:Name="MediaPanel" Grid.Column="1" DataContext="{Binding Spotify}" IsVisible="False"/>
             <Border x:Name="FeaturePanel" Grid.Column="1" Classes="card" Margin="8,0,8,8" IsVisible="False">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16" MaxWidth="400">
                     <TextBlock x:Name="FeatureTitle" FontSize="28" FontWeight="Bold" TextAlignment="Center"/>
