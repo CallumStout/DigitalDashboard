@@ -1,4 +1,4 @@
-﻿using SpotifyAPI.Web;
+using SpotifyAPI.Web;
 using System;
 using System.Linq;
 using DigitalDashboard.Models;
@@ -52,7 +52,7 @@ public class SpotifyService : ISpotifyService
     public async Task<SpotifyLibraryPage> GetLibraryAsync(string category, int offset, string query)
     {
         var client = await GetClientAsync();
-        SpotifyLibraryItem Map(FullTrack t) => new(t.Name, string.Join(", ", t.Artists.Select(a => a.Name)), t.Uri);
+        SpotifyLibraryItem Map(FullTrack t) => new(t.Name, string.Join(", ", t.Artists.Select(a => a.Name)), t.Uri, ArtworkUrl: t.Album?.Images?.OrderBy(i => Math.Abs(i.Width - 160)).FirstOrDefault()?.Url);
         switch (category)
         {
             case "Liked Songs":
@@ -60,7 +60,7 @@ public class SpotifyService : ISpotifyService
                 return new(liked.Items?.Where(t => t.Track != null).Select(t => Map(t.Track)).ToArray() ?? [], liked.Next != null);
             case "Playlists":
                 var playlists = await client.Playlists.CurrentUsers(new PlaylistCurrentUsersRequest { Limit = 50, Offset = offset });
-                return new(playlists.Items?.Where(p => p != null && !string.IsNullOrWhiteSpace(p.Uri)).Select(p => new SpotifyLibraryItem(p.Name ?? "Untitled playlist", p.Owner?.DisplayName ?? "Playlist", p.Uri!, true)).ToArray() ?? [], playlists.Next != null);
+                return new(playlists.Items?.Where(p => p != null && !string.IsNullOrWhiteSpace(p.Uri)).Select(p => new SpotifyLibraryItem(p.Name ?? "Untitled playlist", p.Owner?.DisplayName ?? "Playlist", p.Uri!, true, p.Images?.OrderBy(i => Math.Abs(i.Width - 160)).FirstOrDefault()?.Url)).ToArray() ?? [], playlists.Next != null);
             case "Recent":
                 var recent = await client.Player.GetRecentlyPlayed(new PlayerRecentlyPlayedRequest { Limit = 50 });
                 return new(recent.Items?.Where(p => p.Track != null).Select(p => Map(p.Track)).DistinctBy(t => t.Uri).ToArray() ?? [], false);

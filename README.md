@@ -46,7 +46,15 @@ connection failures show an offline state and retry automatically.
 Choose **Media** in the sidebar for the Spotify remote. Music continues on your
 active Spotify device. The page shares playback state with the overview card and
 shows artwork, progress, elapsed/duration labels, device name, previous/play/next,
-shuffle, and repeat (off, context, track).
+shuffle, and repeat (off, context, track). The player artwork expands with the
+available screen height, and larger controls use the space below it. Progress
+animates locally every 33 ms using a monotonic clock; Spotify polling remains at
+five seconds to resynchronise track changes, pauses, and seeks.
+
+Library rows include album or playlist covers, larger titles, and a play affordance
+against a gradient background. Covers load independently with at most four concurrent
+requests. Missing covers use a music placeholder; switching collections cancels
+pending downloads and releases their bitmaps.
 
 Browse Liked Songs, Playlists, Recent, Top Tracks, or search for tracks by song or
 artist. Tap a track or playlist to start it on the active device. Library lists

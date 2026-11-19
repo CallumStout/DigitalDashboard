@@ -8,6 +8,7 @@ using DigitalDashboard.Models;
 using System.Collections.ObjectModel;
 using System;
 using System.IO;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -20,6 +21,12 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
     private readonly ISpotifyService _spotifyService;
     private readonly HttpClient _httpClient;
     private readonly DispatcherTimer _timer;
+    private readonly DispatcherTimer _progressTimer;
+    private readonly Stopwatch _progressClock = new();
+    private int _progressAnchorMs;
+    private int _durationMs;
+    private CancellationTokenSource? _libraryArtworkLifetime;
+    private readonly SemaphoreSlim _coverRequests = new(4, 4);
     private readonly CancellationTokenSource _lifetime = new();
     private readonly SemaphoreSlim _requests = new(1, 1);
     private bool _isRefreshing;
@@ -66,13 +73,50 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
     [ObservableProperty] private bool _isLibraryLoading;
     [ObservableProperty] private bool _hasMore;
     [ObservableProperty] private bool _libraryFailed;
-    [ObservableProperty] private string _category = "Liked Songs";
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CategoryDescription))]
+    private string _category = "Liked Songs";
     [ObservableProperty] private string _libraryStatus = "";
     [ObservableProperty] private string _searchQuery = "";
     [ObservableProperty] private bool _isSearch;
     private int _libraryOffset;
     private string _submittedQuery = "";
-    public ObservableCollection<SpotifyLibraryItem> LibraryItems { get; } = [];
+    public ObservableCollection<SpotifyLibraryItemViewModel> LibraryItems { get; } = [];
+    public string CategoryDescription => Category switch
+    {
+        "Liked Songs" => "Your favourites, always within reach.",
+        "Playlists" => "Find the soundtrack for right now.",
+        "Recent" => "Pick up where you left off.",
+        "Top Tracks" => "The songs you keep coming back to.",
+        _ => "Find your next favourite."
+    };
+
+    private void ClearLibrary()
+    {
+        _libraryArtworkLifetime?.Cancel();
+        _libraryArtworkLifetime?.Dispose();
+        _libraryArtworkLifetime = CancellationTokenSource.CreateLinkedTokenSource(_token);
+        foreach (var item in LibraryItems) item.Dispose();
+        LibraryItems.Clear();
+    }
+
+    private async Task LoadLibraryArtworkAsync(SpotifyLibraryItemViewModel item, CancellationToken token)
+    {
+        if (!Uri.TryCreate(item.Item.ArtworkUrl, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps) return;
+        var acquired = false;
+        try
+        {
+            await _coverRequests.WaitAsync(token);
+            acquired = true;
+            var bytes = await _httpClient.GetByteArrayAsync(uri, token);
+            if (token.IsCancellationRequested || _disposed) return;
+            using var stream = new MemoryStream(bytes, writable: false);
+            item.Artwork = Bitmap.DecodeToWidth(stream, 160);
+        }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { }
+        catch (Exception ex) { Debug.WriteLine($"Spotify library cover failed: {ex.Message}"); }
+        finally { if (acquired) _coverRequests.Release(); }
+    }
 
     [RelayCommand]
     private async Task BrowseAsync(string category)
@@ -82,7 +126,7 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
         IsSearch = category == "Search";
         _submittedQuery = "";
         IsBrowsing = true;
-        LibraryItems.Clear();
+        ClearLibrary();
         _libraryOffset = 0;
         HasMore = false;
         LibraryFailed = false;
@@ -98,7 +142,7 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
     {
         if (_disposed || IsLibraryLoading || string.IsNullOrWhiteSpace(SearchQuery)) return;
         _submittedQuery = SearchQuery.Trim();
-        LibraryItems.Clear();
+        ClearLibrary();
         _libraryOffset = 0;
         await LoadLibraryAsync();
     }
@@ -114,7 +158,13 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
         {
             var page = await _spotifyService.GetLibraryAsync(Category, _libraryOffset, _submittedQuery).WaitAsync(_token);
             if (_disposed) return;
-            foreach (var item in page.Items) LibraryItems.Add(item);
+            _libraryArtworkLifetime ??= CancellationTokenSource.CreateLinkedTokenSource(_token);
+            foreach (var item in page.Items)
+            {
+                var row = new SpotifyLibraryItemViewModel(item);
+                LibraryItems.Add(row);
+                _ = LoadLibraryArtworkAsync(row, _libraryArtworkLifetime.Token);
+            }
             _libraryOffset += IsSearch ? 10 : 50;
             HasMore = page.HasMore;
             LibraryStatus = LibraryItems.Count == 0 ? "No music found" : $"{LibraryItems.Count} items";
@@ -162,9 +212,19 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
         _timer.Tick += async (_, _) => await RefreshAsync();
         _timer.Start();
+        _progressTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
+        _progressTimer.Tick += (_, _) => UpdateProgress();
+        _progressTimer.Start();
 
         // Start after the window/view has been constructed, on Avalonia's UI thread.
         Dispatcher.UIThread.Post(async () => await RefreshAsync());
+    }
+
+    private void UpdateProgress()
+    {
+        var position = Math.Clamp(_progressAnchorMs + (IsPlaying ? _progressClock.Elapsed.TotalMilliseconds : 0), 0, _durationMs);
+        ProgressPercent = _durationMs > 0 ? 100.0 * position / _durationMs : 0;
+        Elapsed = FormatTime((int)position);
     }
 
     private bool CanControl() => !_disposed && !IsLoading && HasPlayback;
@@ -222,12 +282,15 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
             HasPlayback = playback?.Device != null && !playback.Device.IsRestricted;
             DeviceLabel = playback?.Device == null ? "Open Spotify on your listening device"
                 : $"{(playback.IsPlaying ? "Playing" : "Connected")} on {playback.Device.Name}";
-            Elapsed = FormatTime(playback?.ProgressMs ?? 0);
+            _progressAnchorMs = playback?.ProgressMs ?? 0;
+            _durationMs = track?.DurationMs ?? 0;
+            _progressClock.Restart();
             Duration = FormatTime(track?.DurationMs ?? 0);
-            ProgressPercent = track?.DurationMs > 0 ? Math.Clamp(100.0 * (playback?.ProgressMs ?? 0) / track.DurationMs, 0, 100) : 0;
+
             ShuffleEnabled = playback?.ShuffleState ?? false;
             RepeatMode = playback?.RepeatState ?? "off";
             IsPlaying = track != null && playback!.IsPlaying;
+            UpdateProgress();
             Status = track == null ? "Idle" : IsPlaying ? "Playing" : "Paused";
 
             var images = track?.Album?.Images;
@@ -253,6 +316,8 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
             }
             IsConnected = false;
             DeviceLabel = "Spotify unavailable · reconnecting";
+            _progressClock.Reset();
+            _progressAnchorMs = _durationMs = 0;
             ProgressPercent = 0;
             Elapsed = Duration = "0:00";
             HasPlayback = false;
@@ -323,6 +388,12 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
         
         _disposed = true;
         _timer.Stop();
+        _progressTimer.Stop();
+        _progressClock.Stop();
+        _libraryArtworkLifetime?.Cancel();
+        _libraryArtworkLifetime?.Dispose();
+        foreach (var item in LibraryItems) item.Dispose();
+        LibraryItems.Clear();
         _lifetime.Cancel();
         _lifetime.Dispose();
         ReplaceArtwork(null);

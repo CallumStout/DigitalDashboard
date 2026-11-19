@@ -2,93 +2,105 @@
              xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="DigitalDashboard.Views.MediaView" x:DataType="vm:SpotifyViewModel">
  <UserControl.Styles>
-  <Style Selector="Button.tile"><Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="MinHeight" Value="72"/><Setter Property="Margin" Value="3,0"/><Setter Property="HorizontalContentAlignment" Value="Center"/></Style>
-  <Style Selector="Button.transport"><Setter Property="MinHeight" Value="56"/></Style>
+  <Style Selector="Button.tile"><Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="MinHeight" Value="88"/><Setter Property="Margin" Value="3,0"/><Setter Property="HorizontalContentAlignment" Value="Center"/></Style>
+  <Style Selector="Button.transport"><Setter Property="MinHeight" Value="72"/></Style>
  </UserControl.Styles>
- <Grid RowDefinitions="32,80,*" Margin="8,0,8,8">
-  <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Media" FontSize="22" FontWeight="Bold"/><TextBlock Grid.Column="1" Text="Spotify connected" IsVisible="{Binding IsConnected}" Foreground="#1ED760" VerticalAlignment="Center"/><TextBlock Grid.Column="1" Text="Connecting to Spotify…" IsVisible="{Binding !IsConnected}" VerticalAlignment="Center"/></Grid>
+ <Grid RowDefinitions="40,100,*" Margin="8,0,8,8">
+  <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Media" FontSize="26" FontWeight="Bold"/><TextBlock Grid.Column="1" Text="Spotify connected" IsVisible="{Binding IsConnected}" Foreground="#1ED760" VerticalAlignment="Center"/><TextBlock Grid.Column="1" Text="Connecting to Spotify…" IsVisible="{Binding !IsConnected}" VerticalAlignment="Center"/></Grid>
   <UniformGrid Grid.Row="1" Columns="5" Margin="-3,0">
    <Button Classes="tile" Background="#514394" Command="{Binding BrowseCommand}" CommandParameter="Liked Songs" AutomationProperties.Name="Liked Songs">
     <StackPanel Spacing="4">
-     <icons:MaterialIcon Kind="HeartOutline" Width="22" Height="22" HorizontalAlignment="Center"/>
-     <TextBlock Text="Liked Songs" FontSize="14" TextAlignment="Center"/>
+     <icons:MaterialIcon Kind="HeartOutline" Width="30" Height="30" HorizontalAlignment="Center"/>
+     <TextBlock Text="Liked Songs" FontSize="16" FontWeight="SemiBold" TextAlignment="Center"/>
     </StackPanel>
    </Button>
    <Button Classes="tile" Background="#28654E" Command="{Binding BrowseCommand}" CommandParameter="Playlists" AutomationProperties.Name="Playlists">
     <StackPanel Spacing="4">
-     <icons:MaterialIcon Kind="PlaylistMusic" Width="22" Height="22" HorizontalAlignment="Center"/>
-     <TextBlock Text="Playlists" FontSize="14" TextAlignment="Center"/>
+     <icons:MaterialIcon Kind="PlaylistMusic" Width="30" Height="30" HorizontalAlignment="Center"/>
+     <TextBlock Text="Playlists" FontSize="16" FontWeight="SemiBold" TextAlignment="Center"/>
     </StackPanel>
    </Button>
    <Button Classes="tile" Background="#345778" Command="{Binding BrowseCommand}" CommandParameter="Recent" AutomationProperties.Name="Recent">
     <StackPanel Spacing="4">
-     <icons:MaterialIcon Kind="History" Width="22" Height="22" HorizontalAlignment="Center"/>
-     <TextBlock Text="Recent" FontSize="14" TextAlignment="Center"/>
+     <icons:MaterialIcon Kind="History" Width="30" Height="30" HorizontalAlignment="Center"/>
+     <TextBlock Text="Recent" FontSize="16" FontWeight="SemiBold" TextAlignment="Center"/>
     </StackPanel>
    </Button>
    <Button Classes="tile" Background="#705334" Command="{Binding BrowseCommand}" CommandParameter="Top Tracks" AutomationProperties.Name="Top Tracks">
     <StackPanel Spacing="4">
-     <icons:MaterialIcon Kind="StarOutline" Width="22" Height="22" HorizontalAlignment="Center"/>
-     <TextBlock Text="Top Tracks" FontSize="14" TextAlignment="Center"/>
+     <icons:MaterialIcon Kind="StarOutline" Width="30" Height="30" HorizontalAlignment="Center"/>
+     <TextBlock Text="Top Tracks" FontSize="16" FontWeight="SemiBold" TextAlignment="Center"/>
     </StackPanel>
    </Button>
    <Button Classes="tile" Background="#45454B" Command="{Binding BrowseCommand}" CommandParameter="Search" AutomationProperties.Name="Search">
     <StackPanel Spacing="4">
-     <icons:MaterialIcon Kind="Magnify" Width="22" Height="22" HorizontalAlignment="Center"/>
-     <TextBlock Text="Search" FontSize="14" TextAlignment="Center"/>
+     <icons:MaterialIcon Kind="Magnify" Width="30" Height="30" HorizontalAlignment="Center"/>
+     <TextBlock Text="Search" FontSize="16" FontWeight="SemiBold" TextAlignment="Center"/>
     </StackPanel>
    </Button>
   </UniformGrid>
   <Border Grid.Row="2" Classes="card" Margin="0,8,0,0">
-   <ScrollViewer VerticalScrollBarVisibility="Auto">
-    <Grid RowDefinitions="96,28,24,64,Auto,Auto">
-     <Grid ColumnDefinitions="96,*">
-      <Border CornerRadius="12" Background="{DynamicResource CanvasBrush}" ClipToBounds="True">
+   <Grid RowDefinitions="*,28,24,80,Auto,Auto">
+     <Grid ColumnDefinitions="Auto,*" MinHeight="90">
+      <Border Width="{Binding $self.Bounds.Height}" MaxWidth="280" MaxHeight="280" CornerRadius="16" Background="{DynamicResource CanvasBrush}" ClipToBounds="True">
        <Grid>
         <icons:MaterialIcon Kind="Music" Width="48" Height="48" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasArtwork}"/>
         <Image Source="{Binding AlbumArtwork}" Stretch="UniformToFill" IsVisible="{Binding HasArtwork}"/>
        </Grid>
       </Border>
-      <StackPanel Grid.Column="1" Margin="16,4,0,0" Spacing="4"><TextBlock Text="Now playing" Classes="muted"/><TextBlock Text="{Binding TrackName}" FontSize="22" FontWeight="Bold" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding ArtistName}" TextTrimming="CharacterEllipsis"/></StackPanel>
+      <StackPanel Grid.Column="1" Margin="24,0,0,0" Spacing="4" VerticalAlignment="Center"><TextBlock Text="Now playing" Classes="muted"/><TextBlock Text="{Binding TrackName}" FontSize="28" FontWeight="Bold" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding ArtistName}" FontSize="18" TextTrimming="CharacterEllipsis"/></StackPanel>
      </Grid>
-     <ProgressBar Grid.Row="1" Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="4" Foreground="#1ED760" VerticalAlignment="Center" AutomationProperties.Name="Playback progress"/>
+     <ProgressBar Grid.Row="1" Value="{Binding ProgressPercent}" Minimum="0" Maximum="100" Height="6" Foreground="#1ED760" VerticalAlignment="Center" AutomationProperties.Name="Playback progress"/>
      <Grid Grid.Row="2" ColumnDefinitions="*,Auto"><TextBlock Text="{Binding Elapsed}" FontSize="14"/><TextBlock Grid.Column="1" Text="{Binding Duration}" FontSize="14"/></Grid>
      <UniformGrid Grid.Row="3" Columns="5">
       <Button Classes="transport" Command="{Binding ToggleShuffleCommand}" AutomationProperties.Name="Toggle shuffle">
        <StackPanel>
-        <icons:MaterialIcon Kind="Shuffle" Width="22" Height="22" HorizontalAlignment="Center"/>
-        <TextBlock Text="{Binding ShuffleEnabled, StringFormat='Shuffle: {0}'}" FontSize="11"/>
+        <icons:MaterialIcon Kind="Shuffle" Width="30" Height="30" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding ShuffleEnabled, StringFormat='Shuffle: {0}'}" FontSize="13"/>
        </StackPanel>
       </Button>
       <Button Classes="transport" Command="{Binding PreviousTrackCommand}" AutomationProperties.Name="Previous track">
-       <icons:MaterialIcon Kind="SkipPrevious" Width="24" Height="24"/>
+       <icons:MaterialIcon Kind="SkipPrevious" Width="38" Height="38"/>
       </Button>
       <Button Classes="transport play" Command="{Binding TogglePlaybackCommand}" AutomationProperties.Name="{Binding PlaybackLabel}">
-       <icons:MaterialIcon Kind="{Binding PlaybackIcon}" Width="28" Height="28"/>
+       <icons:MaterialIcon Kind="{Binding PlaybackIcon}" Width="44" Height="44"/>
       </Button>
       <Button Classes="transport" Command="{Binding NextTrackCommand}" AutomationProperties.Name="Next track">
-       <icons:MaterialIcon Kind="SkipNext" Width="24" Height="24"/>
+       <icons:MaterialIcon Kind="SkipNext" Width="38" Height="38"/>
       </Button>
       <Button Classes="transport" Command="{Binding CycleRepeatCommand}" AutomationProperties.Name="Cycle repeat mode">
        <StackPanel>
-        <icons:MaterialIcon Kind="Repeat" Width="22" Height="22" HorizontalAlignment="Center"/>
-        <TextBlock Text="{Binding RepeatMode, StringFormat='Repeat: {0}'}" FontSize="11"/>
+        <icons:MaterialIcon Kind="Repeat" Width="30" Height="30" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding RepeatMode, StringFormat='Repeat: {0}'}" FontSize="13"/>
        </StackPanel>
       </Button>
      </UniformGrid>
      <TextBlock Grid.Row="4" Text="{Binding DeviceLabel}" Foreground="#1ED760" Margin="0,12,0,0" TextWrapping="Wrap"/>
      <TextBlock Grid.Row="5" Text="{Binding PlaybackError}" TextWrapping="Wrap" FontSize="13"/>
     </Grid>
-   </ScrollViewer>
   </Border>
-  <Border Grid.Row="1" Grid.RowSpan="2" Classes="card" IsVisible="{Binding IsBrowsing}">
-   <Grid RowDefinitions="56,Auto,*,48">
-    <Grid ColumnDefinitions="*,Auto"><TextBlock Text="{Binding Category}" FontSize="22" FontWeight="Bold" VerticalAlignment="Center"/><Button Grid.Column="1" Content="Now playing" Command="{Binding CloseLibraryCommand}" Padding="16,0"/></Grid>
+  <Border Grid.Row="1" Grid.RowSpan="2" CornerRadius="16" Padding="16" IsVisible="{Binding IsBrowsing}">
+   <Border.Background><LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%"><GradientStop Color="#302A50" Offset="0"/><GradientStop Color="#171D26" Offset="0.5"/><GradientStop Color="#152822" Offset="1"/></LinearGradientBrush></Border.Background>
+   <Grid RowDefinitions="80,Auto,*,56">
+    <Grid ColumnDefinitions="*,Auto"><StackPanel VerticalAlignment="Center" Spacing="4"><TextBlock Text="{Binding Category}" FontSize="28" FontWeight="Bold"/><TextBlock Text="{Binding CategoryDescription}" FontSize="14" Foreground="#BDB7D8" TextTrimming="CharacterEllipsis"/></StackPanel><Button Grid.Column="1" Content="Now playing" Command="{Binding CloseLibraryCommand}" Padding="16,0"/></Grid>
     <Grid Grid.Row="1" ColumnDefinitions="*,Auto" IsVisible="{Binding IsSearch}" Margin="0,4,0,8"><TextBox Text="{Binding SearchQuery, Mode=TwoWay}" Watermark="Song or artist" MinHeight="48" AutomationProperties.Name="Search Spotify"/><Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" IsEnabled="{Binding !IsLibraryLoading}" Margin="8,0,0,0"/></Grid>
     <ListBox Grid.Row="2" ItemsSource="{Binding LibraryItems}" Background="Transparent">
-     <ListBox.Styles><Style Selector="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/></Style></ListBox.Styles>
-     <ListBox.ItemTemplate><DataTemplate x:DataType="models:SpotifyLibraryItem">
-      <Button Command="{Binding $parent[UserControl].((vm:SpotifyViewModel)DataContext).PlayItemCommand}" CommandParameter="{Binding}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" MinHeight="60" Padding="12,6" AutomationProperties.Name="{Binding Name}"><StackPanel><TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/><TextBlock Text="{Binding Subtitle}" Classes="muted" FontSize="13" TextTrimming="CharacterEllipsis"/></StackPanel></Button>
+     <ListBox.Styles><Style Selector="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0,0,0,10"/></Style></ListBox.Styles>
+     <ListBox.ItemTemplate><DataTemplate x:DataType="vm:SpotifyLibraryItemViewModel">
+      <Button Classes="libraryTrack" Command="{Binding $parent[UserControl].((vm:SpotifyViewModel)DataContext).PlayItemCommand}" CommandParameter="{Binding Item}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" MinHeight="108" Padding="10" CornerRadius="12" Background="#252A37" AutomationProperties.Name="{Binding Name}">
+       <Grid ColumnDefinitions="88,*,48">
+        <Border CornerRadius="10" Width="88" Height="88" ClipToBounds="True">
+         <Border.Background><LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%"><GradientStop Color="#7656B5" Offset="0"/><GradientStop Color="#327B76" Offset="1"/></LinearGradientBrush></Border.Background>
+         <Grid><icons:MaterialIcon Kind="Music" Width="36" Height="36" Foreground="#DDD4FF" IsVisible="{Binding !HasArtwork}"/><Image Source="{Binding Artwork}" Stretch="UniformToFill" IsVisible="{Binding HasArtwork}"/></Grid>
+        </Border>
+        <StackPanel Grid.Column="1" Margin="18,0,12,0" VerticalAlignment="Center" Spacing="5">
+         <TextBlock Text="{Binding KindLabel}" FontSize="10" FontWeight="Bold" Foreground="#A99CD0" LetterSpacing="2"/>
+         <TextBlock Text="{Binding Name}" FontSize="20" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+         <TextBlock Text="{Binding Subtitle}" Foreground="#B9BDCC" FontSize="15" TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
+        <Border Grid.Column="2" Width="42" Height="42" CornerRadius="21" Background="#344D45" VerticalAlignment="Center"><icons:MaterialIcon Kind="Play" Width="26" Height="26" Foreground="#6AE3A0"/></Border>
+       </Grid>
+      </Button>
      </DataTemplate></ListBox.ItemTemplate>
     </ListBox>
     <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto"><TextBlock Text="{Binding LibraryStatus}" VerticalAlignment="Center" FontSize="13" TextTrimming="CharacterEllipsis"/><Button Grid.Column="1" Content="Retry" IsVisible="{Binding LibraryFailed}" Command="{Binding LoadLibraryCommand}" IsEnabled="{Binding !IsLibraryLoading}" Margin="4,0"/><Button Grid.Column="2" Content="Load more" Command="{Binding LoadLibraryCommand}" IsVisible="{Binding HasMore}" IsEnabled="{Binding !IsLibraryLoading}"/></Grid>
