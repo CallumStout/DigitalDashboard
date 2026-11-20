@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:DigitalDashboard.ViewModels" xmlns:models="using:DigitalDashboard.Models"
              xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="DigitalDashboard.Views.MediaView" x:DataType="vm:SpotifyViewModel">
+ <UserControl.Resources><LinearGradientBrush x:Key="MediaBackground" StartPoint="0%,0%" EndPoint="100%,100%"><GradientStop Color="#302A50" Offset="0"/><GradientStop Color="#171D26" Offset="0.5"/><GradientStop Color="#152822" Offset="1"/></LinearGradientBrush></UserControl.Resources>
  <UserControl.Styles>
   <Style Selector="Button.tile"><Setter Property="HorizontalAlignment" Value="Stretch"/><Setter Property="MinHeight" Value="88"/><Setter Property="Margin" Value="3,0"/><Setter Property="HorizontalContentAlignment" Value="Center"/></Style>
   <Style Selector="Button.transport"><Setter Property="MinHeight" Value="72"/></Style>
@@ -39,7 +40,7 @@
     </StackPanel>
    </Button>
   </UniformGrid>
-  <Border Grid.Row="2" Classes="card" Margin="0,8,0,0">
+  <Border Grid.Row="2" CornerRadius="16" Padding="12" Background="{StaticResource MediaBackground}" Margin="0,8,0,0">
    <Grid RowDefinitions="*,28,24,80,Auto,Auto">
      <Grid ColumnDefinitions="Auto,*" MinHeight="90">
       <Border Width="{Binding $self.Bounds.Height}" MaxWidth="280" MaxHeight="280" CornerRadius="16" Background="{DynamicResource CanvasBrush}" ClipToBounds="True">
@@ -79,12 +80,11 @@
      <TextBlock Grid.Row="5" Text="{Binding PlaybackError}" TextWrapping="Wrap" FontSize="13"/>
     </Grid>
   </Border>
-  <Border Grid.Row="1" Grid.RowSpan="2" CornerRadius="16" Padding="16" IsVisible="{Binding IsBrowsing}">
-   <Border.Background><LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%"><GradientStop Color="#302A50" Offset="0"/><GradientStop Color="#171D26" Offset="0.5"/><GradientStop Color="#152822" Offset="1"/></LinearGradientBrush></Border.Background>
+  <Border Grid.Row="1" Grid.RowSpan="2" CornerRadius="16" Padding="16" Background="{StaticResource MediaBackground}" IsVisible="{Binding IsBrowsing}">
    <Grid RowDefinitions="80,Auto,*,56">
     <Grid ColumnDefinitions="*,Auto"><StackPanel VerticalAlignment="Center" Spacing="4"><TextBlock Text="{Binding Category}" FontSize="28" FontWeight="Bold"/><TextBlock Text="{Binding CategoryDescription}" FontSize="14" Foreground="#BDB7D8" TextTrimming="CharacterEllipsis"/></StackPanel><Button Grid.Column="1" Content="Now playing" Command="{Binding CloseLibraryCommand}" Padding="16,0"/></Grid>
     <Grid Grid.Row="1" ColumnDefinitions="*,Auto" IsVisible="{Binding IsSearch}" Margin="0,4,0,8"><TextBox Text="{Binding SearchQuery, Mode=TwoWay}" Watermark="Song or artist" MinHeight="48" AutomationProperties.Name="Search Spotify"/><Button Grid.Column="1" Content="Search" Command="{Binding SearchCommand}" IsEnabled="{Binding !IsLibraryLoading}" Margin="8,0,0,0"/></Grid>
-    <ListBox Grid.Row="2" ItemsSource="{Binding LibraryItems}" Background="Transparent">
+    <ListBox x:Name="LibraryList" ScrollViewer.IsScrollInertiaEnabled="True" Grid.Row="2" ItemsSource="{Binding LibraryItems}" Background="Transparent">
      <ListBox.Styles><Style Selector="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Padding" Value="0"/><Setter Property="Margin" Value="0,0,0,10"/></Style></ListBox.Styles>
      <ListBox.ItemTemplate><DataTemplate x:DataType="vm:SpotifyLibraryItemViewModel">
       <Button Classes="libraryTrack" Command="{Binding $parent[UserControl].((vm:SpotifyViewModel)DataContext).PlayItemCommand}" CommandParameter="{Binding Item}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" MinHeight="108" Padding="10" CornerRadius="12" Background="#252A37" AutomationProperties.Name="{Binding Name}">

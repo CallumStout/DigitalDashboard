@@ -56,8 +56,17 @@ against a gradient background. Covers load independently with at most four concu
 requests. Missing covers use a music placeholder; switching collections cancels
 pending downloads and releases their bitmaps.
 
+The main player and library share the same purple-to-green gradient. Drag a song
+or playlist row vertically to scroll; an eight-pixel movement threshold separates
+scrolling from a tap, so a swipe does not start playback. Mouse wheels and scrollbars
+remain available.
+
 Browse Liked Songs, Playlists, Recent, Top Tracks, or search for tracks by song or
-artist. Tap a track or playlist to start it on the active device. Library lists
+artist. Tap a track to play it and the remaining songs in collection order. Remaining
+pages are fetched before playback starts, so larger libraries can take a moment
+to prepare; playback continues beyond the currently displayed page. A playlist
+selection uses Spotify's playlist context. Existing shuffle/repeat settings still
+apply. Playback remains on the active device. Library lists
 load on demand with **Load more**; Recent shows up to 50 recent plays with duplicate
 tracks removed. Failed loads retain existing items and offer **Retry**.
 

@@ -187,7 +187,35 @@ public partial class SpotifyViewModel : ObservableObject, IDisposable
     {
         if (item == null || _disposed || IsLoading) return Task.CompletedTask;
         IsBrowsing = false;
-        return UpdateAsync(() => _spotifyService.PlayAsync(item));
+        // Snapshot the selected collection before navigation or another library load.
+        var tracks = LibraryItems.Select(row => row.Item).ToList();
+        var category = Category;
+        var query = _submittedQuery;
+        var offset = _libraryOffset;
+        var more = HasMore;
+        return UpdateAsync(async () =>
+        {
+            if (item.IsPlaylist)
+            {
+                await _spotifyService.PlayAsync(item).WaitAsync(_token);
+                return;
+            }
+
+            // Include pages not yet displayed, so playback doesn't stop at a UI page boundary.
+            while (more)
+            {
+                _token.ThrowIfCancellationRequested();
+                var page = await _spotifyService.GetLibraryAsync(category, offset, query).WaitAsync(_token);
+                tracks.AddRange(page.Items);
+                more = page.HasMore;
+                offset += category == "Search" ? 10 : 50;
+            }
+            var selected = tracks.FindIndex(track => track.Uri == item.Uri);
+            var sequence = selected < 0 ? new[] { item.Uri } : tracks.Skip(selected)
+                .Where(track => !track.IsPlaylist && track.Uri.StartsWith("spotify:track:", StringComparison.Ordinal))
+                .Select(track => track.Uri).ToArray();
+            await _spotifyService.PlayAsync(item, sequence).WaitAsync(_token);
+        });
     }
 
     [RelayCommand(CanExecute = nameof(CanControl))]

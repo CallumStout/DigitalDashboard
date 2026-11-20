@@ -1,6 +1,7 @@
 using SpotifyAPI.Web;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using DigitalDashboard.Models;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,12 +76,12 @@ public class SpotifyService : ISpotifyService
         }
     }
 
-    public async Task PlayAsync(SpotifyLibraryItem item)
+    public async Task PlayAsync(SpotifyLibraryItem item, IReadOnlyList<string>? trackUris = null)
     {
         var client = await GetClientAsync();
         await client.Player.ResumePlayback(item.IsPlaylist
             ? new PlayerResumePlaybackRequest { ContextUri = item.Uri }
-            : new PlayerResumePlaybackRequest { Uris = new[] { item.Uri } });
+            : new PlayerResumePlaybackRequest { Uris = trackUris?.ToList() ?? new() { item.Uri } });
     }
 
     public async Task SetShuffleAsync(bool enabled)
